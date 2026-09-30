@@ -90,24 +90,33 @@ Une modélisation en étoile sera conçue.dans Gold layer on aura une Fact_table
 download in Microsoft store and make works email by creating 365 account (or something) 
 If you don’t have windows, y.ou could try vm but nightmare – just use powerbi in synapse.
 
-- [ ]   **Data Ingestion pipeline from Postgres - Lakeflow connect(phase 1)**
+- [ ]   **Data Ingestion pipeline from Postgres with Lakeflow connect(phase 1)**
     - [ ]  Launch Databricks workspace
     - [ ]  Go to Jobs & Pipelines -> Ingestion pipeline(correspondant au *Lakeflow connect* dans le repos)
     - [ ]  **Step 1/5 : Connexion**
         - [ ]  Parmi toutes les sources disponible on clique sur postgreSQL
         - [ ]  Create connexion between Postgres & Databricks(*connex_name = neon_postgres_project*), pour avoir user, passeword et le port on utilise chat gpt en collant le lien qu'on avait récupéré(*based on this url give me the username, passeword and hostname*)
     - [ ]  **Step 2/5 : Ingestion setup**
-        - [ ]  Donner un nom au pipeline(*postgres_to_bronze* et selectionne le catalog et schema cibles(créons les respectivement *retail_q et postgres_bronze*)
+        - [ ]  Donner un nom au pipeline(***postgres_to_bronze*** et sélectionne le catalog et schema cibles(créons les respectivement ***retail_q*** et ***postgres_bronze***)
         - [ ]  Cliquez sur *create pipeline and continu*
-        - [ ]  New -> azure -> self hosted -> create
-        - [ ]  Manual downloads an app with key used later to run, instead do express
-(if it fails do manual…)
-        - [ ]  Open integration runtime config mgr to confirm
-    - [ ]  Step 1 – connect to on prem db and copy using data factory
-        - [ ]  Create new pipeline in author
-        - [ ]  New copy data activity
-        - [ ]  Create new source dataset -> sql -> linked service (needed to connect to any data source) 
-        - [ ]  then create new sink dataset, new linkedservice, your storage account may get error cos of soft delete – so go to storage account -> data protection -> uncheck enable soft delete for blobs
+    - [ ]  **Step 3/5 : Validing pipeline configuration**
+        - [ ]  Spécifier la database, le schema et les 2 tables source à ingérer
+        - [ ]  Choisir ***batch ou incrementielle ingestion:***
+        - [ ]  Choisir dans ***cursor column*** la colonne ***updated_at*** pour définir la colonne ***incrémentielle*** de la table ***product_catalog***
+        - [ ]  Pour la table ***product_catalog*** mettre ***history tracking*** en **ON** pour rendre la table de destination une structure **SCD2** en créant 2 colonnes supplémentaires ***start_at(même valeur que update_at par défaut) & end_at(null par défaut)***.
+        - [ ]  Choisir dans ***cursor column*** la colonne ***last_stock_update_at*** pour définir la colonne ***incrémentielle*** de la table ***inventory***
+        - [ ]  Pour la table ***inventory*** mettre ***history tracking*** en **OFF** pour rendre la table de destination une structure **SCD1**
+              
+**NB!!!** **SCD 2:** *Si un enregistrement est mise à jour ou supprimé depuis la source; alors toute la ligne sera historisée avec une valeur **end_at not null**; une nouvelle ligne avec les nouvelles valeurs vont être créées avec **end_at null** et start_at prend la valeur de la dernière end_at.On créera une colonne conditionnelle nommée active basée sur la end_at is null*
+
+**NB!!!** **SCD 1:** *Il n'ya pas d'historisation les enregistrements modifiées ou supprimées disparaissent directement; seules les lignes activent seront présente: c'est le cas pour la table inventory*
+
+    - [ ]  **Step 4/5 : Spécifier ou stocker les données ingérées dans Databricks**
+        - [ ]  Choisir le catalog ***retail_q*** et le schémas ***postgres_bronze***
+    - [ ]  **Step 5/5 : Configure pipeline schedules(*i;e: par défaut une execution du pipeline est planifiée chaque heure)* and notifications**
+        - [ ]  On supprime le schedule par défaut(every hour execution) pour le moment
+        - [ ]  Pour les notifications on spécifie le mail de réception et cocher ***failure*** pour n'être averti qu'en cas d'echec de l'exection 
+        - [ ]  On clique sur ***save and run pipeline*** pour terminer.Notre pipeline ***Postgres_to_bronze*** est créé.
         - [ ]  **if this doesn’t work you can check by previewing and then run the following**
 
         - [ ]  USE AdventureWorksLT2019;
