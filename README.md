@@ -22,11 +22,13 @@ Ce projet est réalisé pour mettre en évidence la caapcité à développer un 
 
 # 🗺️ Project Phases & Guide
 
-## 🏗️ Phase1 - Project Usecase definition
+> [!NOTE]
+> ## 🏗️ Phase1 - Project Usecase definition
 
 <aside>
 
-***Goal***: *Document à rédiger avec collaboration des métiers pour bien cadrer le besoin.Ce sera un résumé de l'existant, du problème et les solutions adaptées.*
+> [!TIP]
+> ***Goal***: *Document à rédiger avec collaboration des métiers pour bien cadrer le besoin.Ce sera un résumé de l'existant, du problème et les solutions adaptées.*
 
 ## Background
 
@@ -71,8 +73,8 @@ Une modélisation en étoile sera conçue.dans Gold layer on aura une Fact_table
 <img width="893" height="465" alt="image" src="https://github.com/user-attachments/assets/a656c63f-5816-496f-b33c-6e50adab6ae4" />
 
 ---
-
-## 🏗️ Phase2 - Project Initialization
+> [!NOTE]
+> ## 🏗️ Phase2 - Project Initialization
 
 <aside>
 
@@ -92,25 +94,16 @@ Une modélisation en étoile sera conçue.dans Gold layer on aura une Fact_table
         - [ ]  Use salesforce trial account (30 days free trial)
         - [ ]  Conserver le username reçu par mail and reset the password
         - [ ]  Créons les tables sources **Account** & **Opportunity** en important dans salesforce Accounts et Opportunités(fichiers client & Opportunités) les fichiers ***03_salesforce_accounts_history.csv*** et ***04_salesforce_opportunities_history*** disponible dans le dossier ***00_Source_Data*** de ce repos.
-         
-
-        - [ ]  Create Storage Account, make bronze container
-        - [ ]  Create Databricks
-        - [ ]  File system name just make it something relevant and meaningful
-        - [ ]  Create Key Vault
-              
-    
-
-        - [ ]  create login sql script to get username and password
-        - [ ]  execute in correct db (might need to load again)
-        - [ ]  give user permissions via role on LHS
-       
-
-            
                   
-    - [ ]  **Setup Azure blob storage**
-download in Microsoft store and make works email by creating 365 account (or something) 
-If you don’t have windows, y.ou could try vm but nightmare – just use powerbi in synapse.
+    - [ ]  **Setup Azure blob storage as volume**
+      Azure blob storage, S3, gcp sont des stockages cloude qui peuvent stocker n'importe quel type de données(structured, semi structured, not structured).Nous pouvons créer un volume dans Databricks qui aura les memes caractéristiques de stockage que les clouds.
+        - [ ]  Créer un nouveau schéma(***Volumes*** et y créer un volume ***blob_source*** dans le catalog ***retail_q***
+        - [ ]  On a 2 choix de types de volume(external et managed); on choisit managed pour un volume entierement managé par Unity catalog. On aurait choisi external si on avait un adsl ou s3.
+        - [ ]  Créer un répertoire dans volume nommé ***transactions_source** pour y stocker les fichiers source transactions (***05_blob_transactions_history.csv***) disponibles dans le dossier ***00_Source_Data*** de ce repos)
+        - [ ]  On importe le fichier ***05_blob_transactions_history.csv*** dans le volume
+        - [ ]  Copier le ***path:*** "/Volumes/nom catalog/nom schema/nom volume/nom répertoire correspondant dans notre cas à ***"/Volumes/retail_q/Volumes/blob_source/transactions_source"*** (qui sera ultérieurement utilisé)
+        - [ ]  On ne pas utiliser l'option ingestion pipeline comme on l'a fait tantôt avec salesforce et postgres car 
+
 
 - [ ]   **Data Ingestion pipeline from Postgres with Lakeflow connect(phase 1)**
     - [ ]  Launch Databricks workspace
@@ -217,8 +210,8 @@ Now you can see the files and directories in storage account
 </aside>
 
 ---
-
-## 🥉 Phase2 - Building Bronze Layer
+> [!NOTE]
+> ## 🥉 Phase2 - Building Bronze Layer
 
 <aside>
 
@@ -253,8 +246,8 @@ Now you can see the files and directories in storage account
 </aside>
 
 ---
-
-## 🥈 Phase3 - Building Silver Layer
+> [!NOTE]
+> ## 🥈 Phase3 - Building Silver Layer
 
 <aside>
 
@@ -312,8 +305,8 @@ Result: All Bronze tables are transformed into analytics-ready Silver tables wit
 </aside>
 
 ---
-
-## 🥇 Phase4 - Building Gold Layer
+> [!NOTE]
+> ## 🥇 Phase4 - Building Gold Layer
 
 <aside>
 
@@ -365,8 +358,8 @@ You are now responsible for making it reliable, clear, and easy to use
 </aside>
 
 ---
-
-# Phase5 - Building the Pipeline
+> [!NOTE]
+> # Phase5 - Building the Pipeline
 
 <aside>
 
