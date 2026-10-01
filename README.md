@@ -1,7 +1,24 @@
 # Retail project using Lakeflow_Declarative_Pipelines
 
+>   [!NOTE]
+> Ce bloc apparaît en bleu.
 
+> [!TIP]
+> Ce bloc apparaît en vert.
+
+> [!IMPORTANT]
+> Ce bloc apparaît en violet.
+
+> [!WARNING]
+> Ce bloc apparaît en jaune/orange.
+
+
+
+
+`#FF5733` Rouge orangé
+`rgb(52, 152, 219)` Bleu
 Ce projet est réalisé pour mettre en évidence la caapcité à développer un projet de data engineering de bout en bout avec Databricks en utilisant une approche appelée Lakeflow_Declarative_Pipeline. Pour bien montrer les fonctionnalité de Databricks on travaillera sur des données de retail.
+
 
 # 🗺️ Project Phases & Guide
 
@@ -64,20 +81,25 @@ Une modélisation en étoile sera conçue.dans Gold layer on aura une Fact_table
 </aside>
 
 - [ ]  **Environment setup**
+      
+    - [ ]  **Setup PostgreSQL**
+        - [ ]  Use Neon serveless postgres(https://neon.com) et utiliser un google account
+        - [ ]  Donner un project name ( retail_project) et choisir une région proche de France
+            - [ ]  Copier et coller quelque part le lien d'accès généré(qui sera ultérieurement utilisé)
+        - [ ]  Créons les tables sources **product_catalog** et **inventory** dans Postgres en y insérant des données(avec copier coller sur sql editor du code sql disponible dans les fichiers ***01_postgres_product_history.sql*** et ***02_postgres_inventory_history.sql*** disponible dans le dossier ***00_Source_Data*** de ce repos)
+    
     - [ ]  **Setup salesforce**
-        - [ ]  Use new email get 30 days free with $200 credit
-        - [ ]  Create Resource Group
-        - [ ]  Create ADF
+        - [ ]  Use salesforce trial account (30 days free trial)
+        - [ ]  Conserver le username reçu par mail and reset the password
+        - [ ]  Créons les tables sources **Account** & **Opportunity** en important dans salesforce Accounts et Opportunités(fichiers client & Opportunités) les fichiers ***03_salesforce_accounts_history.csv*** et ***04_salesforce_opportunities_history*** disponible dans le dossier ***00_Source_Data*** de ce repos.
+         
+
         - [ ]  Create Storage Account, make bronze container
         - [ ]  Create Databricks
         - [ ]  File system name just make it something relevant and meaningful
         - [ ]  Create Key Vault
               
-    - [ ]  **Setup PostgreSQL**
-        - [ ]  Use Neon serveless postgres(https://neon.com) et utiliser un google account
-            - [ ]  Donner un project name ( retail_project) et choisir une région proche de France
-            - [ ]  Copier et coller quelque part le lien d'accès généré(qui sera ultérieurement utilisé)
-        - [ ]  Créons les tables sources **product_catalog** et **inventory** dans Postgres en y insérant des données(avec copier coller sur sql editor du code sql disponible dans les fichiers *01_postgres_product_history.sql* et *02_postgres_inventory_history.sql* dans le dossier *00_Source_Data* de ce repos)
+    
 
         - [ ]  create login sql script to get username and password
         - [ ]  execute in correct db (might need to load again)
@@ -99,7 +121,7 @@ If you don’t have windows, y.ou could try vm but nightmare – just use powerb
     - [ ]  **Step 2/5 : Ingestion setup**
         - [ ]  Donner un nom au pipeline(***postgres_to_bronze*** et sélectionne le catalog et schema cibles(créons les respectivement ***retail_q*** et ***postgres_bronze***)
         - [ ]  Cliquez sur *create pipeline and continu*
-    - [ ]  **Step 3/5 : Validing pipeline configuration**
+    - [ ]  **Step 3/5 : Validating pipeline configuration**
         - [ ]  Spécifier la database, le schema et les 2 tables source à ingérer
         - [ ]  Choisir ***batch ou incrementielle ingestion:***
         - [ ]  Choisir dans ***cursor column*** la colonne ***updated_at*** pour définir la colonne ***incrémentielle*** de la table ***product_catalog***
@@ -107,23 +129,44 @@ If you don’t have windows, y.ou could try vm but nightmare – just use powerb
         - [ ]  Choisir dans ***cursor column*** la colonne ***last_stock_update_at*** pour définir la colonne ***incrémentielle*** de la table ***inventory***
         - [ ]  Pour la table ***inventory*** mettre ***history tracking*** en **OFF** pour rendre la table de destination une structure **SCD1**
               
-**NB!!!** **SCD 2:** *Si un enregistrement est mise à jour ou supprimé depuis la source; alors toute la ligne sera historisée avec une valeur **end_at not null**; une nouvelle ligne avec les nouvelles valeurs vont être créées avec **end_at null** et start_at prend la valeur de la dernière end_at.On créera une colonne conditionnelle nommée active basée sur la end_at is null*
+> [!CAUTION]
+> **SCD 2:** *Si un enregistrement est mise à jour ou supprimé depuis la source; alors toute la ligne sera historisée avec une valeur **end_at not null**; une nouvelle ligne avec les nouvelles valeurs vont être créées avec **end_at null** et start_at prend la valeur de la dernière end_at.2 lignes vont être updté.On créera une colonne conditionnelle nommée active basée sur la end_at is null*.
+> 
+> **SCD 1:** *Il n'ya pas d'historisation les enregistrements modifiées ou supprimées disparaissent directement; seules les lignes activent seront présente: c'est le cas pour la table inventory.Une ligne sera updatée par le pipeline*.
 
-**NB!!!** **SCD 1:** *Il n'ya pas d'historisation les enregistrements modifiées ou supprimées disparaissent directement; seules les lignes activent seront présente: c'est le cas pour la table inventory*
+  - [ ]  **Step 4/5 : Spécifier ou stocker les données ingérées dans Databricks**
+     - [ ]  Choisir le catalog ***retail_q*** et le schémas ***postgres_bronze***
+  - [ ]  **Step 5/5 : Schedules(run planification) & Notifications**
+    - [ ]  Add a trigger to run the job on a schedule (for example daily)
+    - [ ]  Pour l'instant nous supprimons le schedule de défaut qu'on configurera plus tard en fonction des besoins d'execution
+    - [ ]  Les notifications ne sont configurées qu'avec **failure** afin de ce recevoir un email en cas d'echec de pipeline execution.
+    - [ ]  On clique sur **Save & Run** pour terminer la création du **ingestion pipeline** nommé ***postgres_to_bronze*** qui ingère dans le catalogue ***retail_q*** et le schema ***postgres_bronze*** de Unity catalog de databricks les tables ***product_catalog*** et ***inventory***.
+    
+- [ ]  **Data Ingestion pipeline from Salesforce with Lakeflow connect(phase 2)**
+    - [ ]  Go to Jobs & Pipelines -> Ingestion pipeline(correspondant au *Lakeflow connect* dans le repos)
+    - [ ]  **Step 1/5 : Connexion**
+        - [ ]  Parmi toutes les sources disponible on clique sur Salesforce
+        - [ ]  Create connexion between Salesforce & Databricks(*connex_name = Salesforce_retail_project*),
+        - [ ]  On utilise les username, passeword obtenus lors de la création du salesforce account
+    - [ ]  **Step 2/5 : Ingestion setup**
+        - [ ]  Donner un nom au pipeline (***salesforce_to_bronze***) et on sélectionne le catalog ***retail_q*** et on crée le schéma cibles ***salesforce_bronze***
+        - [ ]  Cliquez sur *create pipeline and continu*
+    - [ ]  **Step 3/5 : Validating pipeline configuration**
+        - [ ]  Spécifier la database, le schema et les 2 tables source à ingérer
+        - [ ]  Cocher ***history tracking*** en **ON ou OFF**définit le choix entre  ***batch et incrementielle ingestion***
+        - [ ]  Pas besoin de préciser un ***cursor column*** sur Salesforce car c'est déja intégré la colonne pour définir la colonne ***incrémentielle*** de la table ***account***
+        - [ ]  Pour la table ***opportunity*** mettre ***history tracking*** en **OFF**.
+  - [ ]  **Step 4/5 : Spécifier où stocker les données ingérées dans Databricks**
+     - [ ]  Choisir le catalog ***retail_q*** et le schémas ***sales_bronze***
+  - [ ]  **Step 5/5 : Schedules(run planification) & Notifications**
+    - [ ]  Add a trigger to run the job on a schedule (for example daily)
+    - [ ]  Pour l'instant nous supprimons le schedule de défaut qu'on configurera plus tard en fonction des besoins d'execution
+    - [ ]  Les notifications ne sont configurées qu'avec **failure** afin de ce recevoir un email en cas d'echec de pipeline execution.
+    - [ ]  On clique sur **Save & Run** pour terminer la création du **ingestion pipeline** nommé ***salesforce_to_bronze*** qui ingère dans le catalogue ***retail_q*** et le schema ***salesforce_bronze*** de Unity catalog de databricks les tables ***account** et ***opportunity***.
 
-    - [ ]  **Step 4/5 : Spécifier ou stocker les données ingérées dans Databricks**
-        - [ ]  Choisir le catalog ***retail_q*** et le schémas ***postgres_bronze***
-    - [ ]  **Step 5/5 : Configure pipeline schedules(*i;e: par défaut une execution du pipeline est planifiée chaque heure)* and notifications**
-        - [ ]  On supprime le schedule par défaut(every hour execution) pour le moment
-        - [ ]  Pour les notifications on spécifie le mail de réception et cocher ***failure*** pour n'être averti qu'en cas d'echec de l'exection 
-        - [ ]  On clique sur ***save and run pipeline*** pour terminer.Notre pipeline ***Postgres_to_bronze*** est créé.
-        - [ ]  **if this doesn’t work you can check by previewing and then run the following**
 
-        - [ ]  USE AdventureWorksLT2019;
-        - [ ]  GRANT SELECT ON SalesLT.Address TO mrk;
-        - [ ]  **If still doesn’t work (JreNotFound) it may be that you need java installed (via choco or brew ideally)**
 
-- [ ]  **Data Ingestion with ADF (phase 2)**
+
     - [ ]  Delete the file, as now creating pipeline for all tables
     - [ ]  Create new pipeline
     - [ ]  Create new SQL script in SSMS that lists all tables under SalesLT schema
