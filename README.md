@@ -102,7 +102,12 @@ Une modélisation en étoile sera conçue.dans Gold layer on aura une Fact_table
         - [ ]  Créer un répertoire dans volume nommé ***transactions_source** pour y stocker les fichiers source transactions (***05_blob_transactions_history.csv***) disponibles dans le dossier ***00_Source_Data*** de ce repos)
         - [ ]  On importe le fichier ***05_blob_transactions_history.csv*** dans le volume
         - [ ]  Copier le ***path:*** "/Volumes/nom catalog/nom schema/nom volume/nom répertoire correspondant dans notre cas à ***"/Volumes/retail_q/Volumes/blob_source/transactions_source"*** (qui sera ultérieurement utilisé)
-        - [ ]  On ne pas utiliser l'option ingestion pipeline comme on l'a fait tantôt avec salesforce et postgres car 
+        - [ ]  ***blob_source*** etant disponible dans un volume nous devons l'ingérer dans un nouveau schéma ***blob_bronze** du catalog ***retail_q***.
+
+ Dans le lakeflow connect des des connecteurs sont disponibles pour salesforces, postgres et tant d'autres rendant l'option ***ingestion pipeline (lakeflow connect)*** possible mais un transfert de données d'un volume databricks à un schema (ou élémens internes à Unity catalog) n'est pas disponible car on a affaire à un transfert entre repertoires. On ne peut donc utiliser l'option ingestion pipeline (lakeflow connect) comme on l'a fait tantôt avec salesforce et postgres.Peut dans l'avenir Databricks intégrera un connecteur adapté dans le lakeflow connect.
+Pour pallier à ce problème Databricks dispose d'un outil appelé ***Autoloader*** faisant référence à une ingestion interne à Databricks disponible via notebook.
+        - [ ]  
+        - [ ] 
 
 
 - [ ]   **Data Ingestion pipeline from Postgres with Lakeflow connect(phase 1)**
@@ -157,9 +162,30 @@ Une modélisation en étoile sera conçue.dans Gold layer on aura une Fact_table
     - [ ]  Les notifications ne sont configurées qu'avec **failure** afin de ce recevoir un email en cas d'echec de pipeline execution.
     - [ ]  On clique sur **Save & Run** pour terminer la création du **ingestion pipeline** nommé ***salesforce_to_bronze*** qui ingère dans le catalogue ***retail_q*** et le schema ***salesforce_bronze*** de Unity catalog de databricks les tables ***account** et ***opportunity***.
 
+- [ ]  **Data Ingestion pipeline from Volume with Autoloader(phase 3)**
+    - [ ]  **Step 1/5 : Create a folder & notebooks**
+        - [ ]  Go to Databricks workspace -> Create new folder nommé ***retail_q*** dans le workspace où l'on stokera tout ce qui est important(notebooks,...)
+        - [ ]  Create notebook nommé ***blob_to_bronze***,
+    - [ ]  **Step 2/5 : Autoloader code**
+        - [ ]  Ecrire le Autoloader code pour ingérer les fichiers
+        - [ ]  Il est conseillé d'utiliser Genie code pour gagner du temps
+        - [ ]  Cliquez sur *create pipeline and continu*
+    - [ ]  **Step 3/5 : Validating pipeline configuration**
+        - [ ]  Spécifier la database, le schema et les 2 tables source à ingérer
+        - [ ]  Cocher ***history tracking*** en **ON ou OFF**définit le choix entre  ***batch et incrementielle ingestion***
+        - [ ]  Pas besoin de préciser un ***cursor column*** sur Salesforce car c'est déja intégré la colonne pour définir la colonne ***incrémentielle*** de la table ***account***
+        - [ ]  Pour la table ***opportunity*** mettre ***history tracking*** en **OFF**.
+  - [ ]  **Step 4/5 : Spécifier où stocker les données ingérées dans Databricks**
+     - [ ]  Choisir le catalog ***retail_q*** et le schémas ***sales_bronze***
+  - [ ]  **Step 5/5 : Schedules(run planification) & Notifications**
+    - [ ]  Add a trigger to run the job on a schedule (for example daily)
+    - [ ]  Pour l'instant nous supprimons le schedule de défaut qu'on configurera plus tard en fonction des besoins d'execution
+    - [ ]  Les notifications ne sont configurées qu'avec **failure** afin de ce recevoir un email en cas d'echec de pipeline execution.
+    - [ ]  On clique sur **Save & Run** pour terminer la création du **ingestion pipeline** nommé ***salesforce_to_bronze*** qui ingère dans le catalogue ***retail_q*** et le schema ***salesforce_bronze*** de Unity catalog de databricks les tables ***account** et ***opportunity***.
 
 
-
+Dans le lakeflow connect des des connecteurs sont disponibles pour salesforces, postgres et tant d'autres rendant l'option ***ingestion pipeline (lakeflow connect)*** possible mais un transfert de données d'un volume databricks à un schema (ou élémens internes à Unity catalog) n'est pas disponible car on a affaire à un transfert entre repertoires. On ne peut donc utiliser l'option ingestion pipeline (lakeflow connect) comme on l'a fait tantôt avec salesforce et postgres.Peut dans l'avenir Databricks intégrera un connecteur adapté dans le lakeflow connect.
+Pour pallier à ce problème Databricks dispose d'un outil appelé ***Autoloader*** faisant référence à une ingestion interne à Databricks disponible via notebook.
     - [ ]  Delete the file, as now creating pipeline for all tables
     - [ ]  Create new pipeline
     - [ ]  Create new SQL script in SSMS that lists all tables under SalesLT schema
