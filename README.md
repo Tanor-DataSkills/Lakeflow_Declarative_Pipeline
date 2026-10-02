@@ -182,11 +182,76 @@ Pour pallier à ce problème Databricks dispose d'un outil appelé ***Auto loade
 >  **Answer 1:**
 
 
-      >  bnjgjj
+      >  genie output
+      
+        # Databricks notebook source
+        
+        # Read CSV files using Auto Loader
+        df = (spark.readStream
+        .format("cloudFiles")
+        .option("cloudFiles.format", "csv")
+        .option("cloudFiles.schemaLocation", "/Volumes/retail_q/volumes/blob_source/_schema")
+        .option("header", "true")
+        .option("inferSchema", "true")
+        .load("/Volumes/retail_q/volumes/blob_source/transactions_source/")
+       )
 
-          
-         
+        # Write to bronze table - process available data and stop
+         query = (df.writeStream
+        .option("checkpointLocation", "/Volumes/retail_q/volumes/blob_source/_checkpoint")
+        .trigger(availableNow=True)
+        .toTable("retail_q.blob_bronze.transactions")
+       )
 
+        # Wait for the batch to complete
+        query.awaitTermination()
+
+        # COMMAND ----------
+
+        # MAGIC %sql
+        # MAGIC select count(*) from retail_q.blob_bronze.transactions
+        
+
+> [!CAUTION]
+> **Interprétation**
+> 
+> **Auto Loader:** *Auto loader est adaptée pour lecture et écriture de données entre un volume et schemas se trouvant tous dans Databricks*.
+
+**spark.readStream:** *Il n'ya pas d'historisation les enregistrements modifiées ou supprimées disparaissent directement; seules les lignes activent seront présente: c'est le cas pour la table inventory.Une ligne sera updatée par le pipeline*.
+
+**.format("cloudFiles"):**
+
+**.option("cloudFiles.format", "csv"):**
+
+**.option("cloudFiles.schemaLocation", "/Volumes/retail_q/volumes/blob_source/_schema"):**
+
+**.option("header", "true"):**
+
+**.option("inferSchema", "true"):**
+> 
+**.load("/Volumes/retail_q/volumes/blob_source/transactions_source/"):**
+
+**df.writeStream:**
+
+**.option("checkpointLocation", "/Volumes/retail_q/volumes/blob_source/_checkpoint"):**
+
+**.trigger(availableNow=True):**
+
+**.toTable("retail_q.blob_bronze.transactions"):**
+
+
+> [!WARNING]
+> *Le code généré par genie ne doit pas être directement utilisé; il doit être réadapté car il peut contenir des imperfections:*
+>
+> On peut :
+
+ *1- Faire des **commentaires** explicites pour chaque étapes*
+
+*2- Configurer des **paths et f string function** pour éviter de taper des noms de repertoires longs passible à des erreurs*
+
+Ci-dessous n exemple de reading csv files avec Autoloader reformatté:
+
+<img width="983" height="573" alt="image" src="https://github.com/user-attachments/assets/07d19f59-5de2-489b-9bc7-e5fc00465407" />
 
 
    - [ ]  **Step 3/5 : Validating pipeline configuration**
