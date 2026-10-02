@@ -28,7 +28,7 @@ Ce projet est réalisé pour mettre en évidence la caapcité à développer un 
 <aside>
 
 > [!TIP]
-> ***Goal***: *Document à rédiger avec collaboration des métiers pour bien cadrer le besoin.Ce sera un résumé de l'existant, du problème et les solutions adaptées.*
+> ***Goal***: *Document à rédiger avec collaboration des métiers pour bien cadrer le besoin.Ce sera un résumé de l'existant, du problème et les solutions adaptées.Il sera lieu de dessiner une architecture technique*
 
 ## Background
 
@@ -105,7 +105,7 @@ Une modélisation en étoile sera conçue.dans Gold layer on aura une Fact_table
         - [ ]  ***blob_source*** etant disponible dans un volume nous devons l'ingérer dans un nouveau schéma ***blob_bronze** du catalog ***retail_q***.
 
  Dans le lakeflow connect des des connecteurs sont disponibles pour salesforces, postgres et tant d'autres rendant l'option ***ingestion pipeline (lakeflow connect)*** possible mais un transfert de données d'un volume databricks à un schema (ou élémens internes à Unity catalog) n'est pas disponible car on a affaire à un transfert entre repertoires. On ne peut donc utiliser l'option ingestion pipeline (lakeflow connect) comme on l'a fait tantôt avec salesforce et postgres.Peut dans l'avenir Databricks intégrera un connecteur adapté dans le lakeflow connect.
-Pour pallier à ce problème Databricks dispose d'un outil appelé ***Autoloader*** faisant référence à une ingestion interne à Databricks disponible via notebook.
+Pour pallier à ce problème Databricks dispose d'un outil appelé ***Auto loader*** faisant référence à une ingestion interne à Databricks disponible via notebook.
         - [ ]  
         - [ ] 
 
@@ -165,12 +165,31 @@ Pour pallier à ce problème Databricks dispose d'un outil appelé ***Autoloader
 - [ ]  **Data Ingestion pipeline from Volume with Autoloader(phase 3)**
     - [ ]  **Step 1/5 : Create a folder & notebooks**
         - [ ]  Go to Databricks workspace -> Create new folder nommé ***retail_q*** dans le workspace où l'on stokera tout ce qui est important(notebooks,...)
-        - [ ]  Create notebook nommé ***blob_to_bronze***,
-    - [ ]  **Step 2/5 : Autoloader code**
+        - [ ]  Create notebook nommé ***blob_to_bronze***
+        - [ ]  Create manually a schema ***blob_bronze*** in ***retail_q*** catalog 
+    - [ ]  **Step 2/5 : Autoloader code with genie**
         - [ ]  Ecrire le Autoloader code pour ingérer les fichiers
-        - [ ]  Il est conseillé d'utiliser Genie code pour gagner du temps
-        - [ ]  Cliquez sur *create pipeline and continu*
-    - [ ]  **Step 3/5 : Validating pipeline configuration**
+        - [ ]  Il est conseillé d'utiliser Genie code pour gagner du temps(Genie dispose 2 variants: **Agent**(run multi step data and AI tasks- ***changer le code du notebook***) & **Chat**(Asking question about your code).
+        - [ ]  Choisir Agent et saisir les questions(ce qu'on souhaite faire) dans le prompt.
+
+> [!IMPORTANT]
+> **Goal of the question :** For reading csv files from source and write them into target schema using Auto loader
+> 
+> **Question 1:** We are getting csv files at ***"/Volumes/retail_q/Volumes/blob_source/transactions_source"***
+> 
+> read the csv files with Auto loader and then write them into the target table ***"retail_q.blob_bronze.transactions"***
+> 
+>  **Answer 1:**
+
+
+      >  bnjgjj
+
+          
+         
+
+
+
+   - [ ]  **Step 3/5 : Validating pipeline configuration**
         - [ ]  Spécifier la database, le schema et les 2 tables source à ingérer
         - [ ]  Cocher ***history tracking*** en **ON ou OFF**définit le choix entre  ***batch et incrementielle ingestion***
         - [ ]  Pas besoin de préciser un ***cursor column*** sur Salesforce car c'est déja intégré la colonne pour définir la colonne ***incrémentielle*** de la table ***account***
