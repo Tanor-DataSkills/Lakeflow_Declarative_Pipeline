@@ -182,7 +182,7 @@ Pour pallier à ce problème Databricks dispose d'un outil appelé ***Auto loade
 >  **Answer 1:**
 
 
-      >  genie output
+      >  genie output ( cf 01_blob_to_bronze.py file)
       
         # Databricks notebook source
         
@@ -249,10 +249,13 @@ Pour pallier à ce problème Databricks dispose d'un outil appelé ***Auto loade
 
 *2- Configurer des **paths et f string function** pour éviter de taper des noms de repertoires longs passible à des erreurs*
 
-Ci-dessous n exemple de reading csv files avec Autoloader reformatté:
+Ci-dessous un exemple de reading csv files avec Autoloader reformatté:
 
 <img width="983" height="573" alt="image" src="https://github.com/user-attachments/assets/07d19f59-5de2-489b-9bc7-e5fc00465407" />
 
+un exemple de writting csv files avec Autoloader reformatté:
+
+<img width="973" height="294" alt="image" src="https://github.com/user-attachments/assets/4bbbe3cb-efff-4c0e-976b-be3e9a7a91dc" />
 
    - [ ]  **Step 3/5 : Validating pipeline configuration**
         - [ ]  Spécifier la database, le schema et les 2 tables source à ingérer
