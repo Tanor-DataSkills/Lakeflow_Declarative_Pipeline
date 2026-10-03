@@ -22,8 +22,8 @@ Ce projet est réalisé pour mettre en évidence la caapcité à développer un 
 
 # 🗺️ Project Phases & Guide
 
-> [!NOTE]
-> ## 🏗️ Phase1 - Project Usecase definition
+
+## 🏗️ Phase1 - Project Usecase definition
 
 <aside>
 
@@ -73,8 +73,8 @@ Une modélisation en étoile sera conçue.dans Gold layer on aura une Fact_table
 <img width="893" height="465" alt="image" src="https://github.com/user-attachments/assets/a656c63f-5816-496f-b33c-6e50adab6ae4" />
 
 ---
-> [!NOTE]
-> ## 🏗️ Phase2 - Project Initialization
+
+## 🏗️ Phase2 - Project Initialization
 
 <aside>
 
@@ -104,11 +104,15 @@ Une modélisation en étoile sera conçue.dans Gold layer on aura une Fact_table
         - [ ]  Copier le ***path:*** "/Volumes/nom catalog/nom schema/nom volume/nom répertoire correspondant dans notre cas à ***"/Volumes/retail_q/Volumes/blob_source/transactions_source"*** (qui sera ultérieurement utilisé)
         - [ ]  ***blob_source*** etant disponible dans un volume nous devons l'ingérer dans un nouveau schéma ***blob_bronze** du catalog ***retail_q***.
 
- Dans le lakeflow connect des des connecteurs sont disponibles pour salesforces, postgres et tant d'autres rendant l'option ***ingestion pipeline (lakeflow connect)*** possible mais un transfert de données d'un volume databricks à un schema (ou élémens internes à Unity catalog) n'est pas disponible car on a affaire à un transfert entre repertoires. On ne peut donc utiliser l'option ingestion pipeline (lakeflow connect) comme on l'a fait tantôt avec salesforce et postgres.Peut dans l'avenir Databricks intégrera un connecteur adapté dans le lakeflow connect.
+> [!NOTE]
+> 
+> **Lakeflow Connect** *est une collection de connecteurs managés dans Azure Databricks qui simplifient l’ingestion des données à partir de sources externes. Au lieu d’écrire du code d’extraction personnalisé, vous configurez des pipelines via une interface graphique ou des définitions déclaratives.*
+> 
+> *Dans le lakeflow connect des connecteurs managés sont disponibles pour salesforces, postgres et tant d'autres rendant l'option ***ingestion pipeline (lakeflow connect)*** possible mais un transfert de données d'un volume databricks à un schema (ou élémens internes à Unity catalog) n'est pas disponible car on a affaire à un transfert entre repertoires. On ne peut donc utiliser l'option ingestion pipeline (lakeflow connect) comme on l'a fait tantôt avec salesforce et postgres.Peut dans l'avenir Databricks intégrera un connecteur adapté dans le lakeflow connect.*
+>
+> *Lorsque vous créez un pipeline d’ingestion pour un connecteur de base de données tel que SQL Server, Lakeflow Connect crée également une passerelle d’ingestion. Cette passerelle extrait en continu les données modifiées de la base de données source et les met en phase pour le traitement. Pour les connecteurs SaaS comme Salesforce, le connecteur gère l’extraction directement sans passerelle distincte.
 Pour pallier à ce problème Databricks dispose d'un outil appelé ***Auto loader*** faisant référence à une ingestion interne à Databricks disponible via notebook.
-        - [ ]  
-        - [ ] 
-
+Nous utiliserons les connecteurs managés de lakeflow connect pour créer 2 pipelines d'ingestion pour les données sources de Salesforces et Neon postgreSQL; pour ce qui est des données qui sont le volume de Databricks on utilisera Auto loader à travers un code personnalisé sur notebook python.*
 
 - [ ]   **Data Ingestion pipeline from Postgres with Lakeflow connect(phase 1)**
     - [ ]  Launch Databricks workspace
@@ -127,8 +131,10 @@ Pour pallier à ce problème Databricks dispose d'un outil appelé ***Auto loade
         - [ ]  Choisir dans ***cursor column*** la colonne ***last_stock_update_at*** pour définir la colonne ***incrémentielle*** de la table ***inventory***
         - [ ]  Pour la table ***inventory*** mettre ***history tracking*** en **OFF** pour rendre la table de destination une structure **SCD1**
               
-> [!CAUTION]
-> **SCD 2:** *Si un enregistrement est mise à jour ou supprimé depuis la source; alors toute la ligne sera historisée avec une valeur **end_at not null**; une nouvelle ligne avec les nouvelles valeurs vont être créées avec **end_at null** et start_at prend la valeur de la dernière end_at.2 lignes vont être updté.On créera une colonne conditionnelle nommée active basée sur la end_at is null*.
+> [!NOTE]
+> *Le paramètre de type SCD détermine la façon dont la table de destination gère les modifications.*
+> 
+> **SCD 2:** *Si un enregistrement est mise à jour ou supprimé depuis la source; alors toute la ligne sera historisée avec une valeur **end_at not null**; une nouvelle ligne avec les nouvelles valeurs vont être créées avec **end_at null** et start_at prend la valeur de la dernière end_at.2 lignes vont être updté.On créera une colonne conditionnelle nommée active basée sur la end_at is null*.Cette approche suit la façon dont les données évoluent au fil du temps.
 > 
 > **SCD 1:** *Il n'ya pas d'historisation les enregistrements modifiées ou supprimées disparaissent directement; seules les lignes activent seront présente: c'est le cas pour la table inventory.Une ligne sera updatée par le pipeline*.
 
@@ -139,7 +145,7 @@ Pour pallier à ce problème Databricks dispose d'un outil appelé ***Auto loade
     - [ ]  Pour l'instant nous supprimons le schedule de défaut qu'on configurera plus tard en fonction des besoins d'execution
     - [ ]  Les notifications ne sont configurées qu'avec **failure** afin de ce recevoir un email en cas d'echec de pipeline execution.
     - [ ]  On clique sur **Save & Run** pour terminer la création du **ingestion pipeline** nommé ***postgres_to_bronze*** qui ingère dans le catalogue ***retail_q*** et le schema ***postgres_bronze*** de Unity catalog de databricks les tables ***product_catalog*** et ***inventory***.
-    
+
 - [ ]  **Data Ingestion pipeline from Salesforce with Lakeflow connect(phase 2)**
     - [ ]  Go to Jobs & Pipelines -> Ingestion pipeline(correspondant au *Lakeflow connect* dans le repos)
     - [ ]  **Step 1/5 : Connexion**
@@ -161,6 +167,7 @@ Pour pallier à ce problème Databricks dispose d'un outil appelé ***Auto loade
     - [ ]  Pour l'instant nous supprimons le schedule de défaut qu'on configurera plus tard en fonction des besoins d'execution
     - [ ]  Les notifications ne sont configurées qu'avec **failure** afin de ce recevoir un email en cas d'echec de pipeline execution.
     - [ ]  On clique sur **Save & Run** pour terminer la création du **ingestion pipeline** nommé ***salesforce_to_bronze*** qui ingère dans le catalogue ***retail_q*** et le schema ***salesforce_bronze*** de Unity catalog de databricks les tables ***account** et ***opportunity***.
+
 
 - [ ]  **Data Ingestion pipeline from Volume with Autoloader(phase 3)**
     - [ ]  **Step 1/5 : Create a folder & notebooks**
@@ -212,33 +219,153 @@ Pour pallier à ce problème Databricks dispose d'un outil appelé ***Auto loade
         # MAGIC select count(*) from retail_q.blob_bronze.transactions
         
 
-> [!CAUTION]
+> [!IMPORTANT]
 > **Interprétation**
 > 
-> **Auto Loader:** *Auto loader est adaptée pour lecture et écriture de données entre un volume et schemas se trouvant tous dans Databricks*.
+> **Auto Loader:** *Auto Loader (via format("cloudFiles")) est l'outil recommandé par Databricks pour ingérer en continu ou par lots des fichiers volumineux stockés dans un Cloud Object Storage (Databrick's Volumes, S3, ADLS, GCS). Nos sources sont dans un volume de Databricks et notre cible dans un schemas de Unity Catalog de Databricks. Sa force se trouve dans sa capacité à détecter et traiter automatiquement les nouveaux fichiers avec l’évolution du schéma*.
 
-**spark.readStream:** *Il n'ya pas d'historisation les enregistrements modifiées ou supprimées disparaissent directement; seules les lignes activent seront présente: c'est le cas pour la table inventory.Une ligne sera updatée par le pipeline*.
 
-**.format("cloudFiles"):**
 
-**.option("cloudFiles.format", "csv"):**
-
-**.option("cloudFiles.schemaLocation", "/Volumes/retail_q/volumes/blob_source/_schema"):**
-
-**.option("header", "true"):**
-
-**.option("inferSchema", "true"):**
+> [!NOTE]
+> **Rappel sur Ingesting data into the Unity catalog:**
 > 
-**.load("/Volumes/retail_q/volumes/blob_source/transactions_source/"):**
+> Les notebooks dans Azure Databricks fournissent une approche flexible, pilotée par le code, pour ingérer des données provenant de diverses sources. Lorsque les outils graphiques comme lakeflow connect ne répondent pas à vos besoins ou que vous avez besoin d’une logique personnalisée pour la transformation des données, les notebooks vous permettent de contrôler complètement le processus d’ingestion(**Ingesting batch and streaming data using notebooks with DataFrames and Structured Streaming**).
+> Les codes python (read & write) pour ingérer des données à l’aide de notebooks varient selon les scénarios de traitement (par lots, de streaming) et l'emplacement de stockage(hors Cloud/Cloud Object Storage).
 
-**df.writeStream:**
+ **Ingérer des données par lots avec des DataFrames**
 
-**.option("checkpointLocation", "/Volumes/retail_q/volumes/blob_source/_checkpoint"):**
+ **Reading files**
 
-**.trigger(availableNow=True):**
+    >  # Reading csv files**
 
-**.toTable("retail_q.blob_bronze.transactions"):**
+     df = (spark.read
+    .format("csv")
+    .option("header", "true")
+    .option("inferSchema", "true")
+    .load("/Volumes/catalog/schema/volume/data.csv"))
 
+    # Reading from different file formats
+    
+    # Read JSON files
+     df_json = spark.read
+     .format("json")
+     .load("/path/to/data.json")
+
+    # Read Parquet files (columnar format, efficient for analytics)
+    df_parquet = spark.read
+    .format("parquet")
+    .load("/path/to/data.parquet")
+
+    # Read XML files (requires rowTag option)
+    df_xml = (spark.read
+    .format("xml")
+    .option("rowTag", "record")
+    .load("/path/to/data.xml"))
+
+**Writing files**
+
+    > # Reading csv files**
+     df.write
+       .mode("overwrite")
+       .saveAsTable("catalog.schema.table_name")
+
+ **Ingesting streaming data with Structured Streaming**
+
+ Au lieu d'utiliser **spark.read**, vous utilisez **spark.readStream** pour créer un DataFrame de streaming qui traite les nouvelles  données de manière incrémentielle. L’exemple suivant lit les données de streaming à partir de Kafka :
+
+**Reading files**
+
+    > # Reading from kafka
+     df_stream = (spark.readStream
+    .format("kafka")
+    .option("kafka.bootstrap.servers", "broker:9092")
+    .option("subscribe", "topic-name")
+    .option("startingOffsets", "latest")
+    .load())
+ 
+**Ingesting data with Spark Structured Streaming like Delta lake Unity catalog**
+
+Vous pouvez également diffuser en continu à partir de sources de fichiers à mesure que de nouveaux fichiers arrivent dans un répertoire (volume):
+**Reading data from volume unity catalog**
+Utilisez **readStream** pour lire les fichiers en continue
+    > 
+     df_file_stream = (spark.readStream
+    .format("csv")
+    .option("header", "true")
+    .schema(defined_schema)
+    .load("/Volumes/catalog/schema/volume/incoming/"))
+
+**Writing data to Unity catalog tables**
+Utilisez **writeStream** pour conserver les données de streaming dans les tables du Unity Catalog :
+
+  >
+     (df_stream
+    .writeStream
+    .format("delta")
+    .outputMode("append")
+    .option("checkpointLocation", "/checkpoints/my-stream")
+    .toTable("catalog.schema.streaming_table"))
+
+**Ingesting data with the autoloader**
+
+Dans le cas des streaming sur un cloud storage(Lorsque de nouveaux fichiers de données arrivent en continu dans le stockage cloud s3, adsl, volumes) vous avez besoin d’un moyen efficace de les traiter sans suivre manuellement les fichiers qui ont été ingérés. Auto Loader résout ce problème.
+
+Auto loader surveille un emplacement de stockage cloud et traite de manière incrémentielle les nouveaux fichiers. 
+Auto loader traite d'abord les fichiers existants dans le répertoire, puis **surveille en permanence les nouveaux arrivées**. Il stocke les informations de progression et l'etat des fichiers dans un **CheckpointLocation**( emplacement de point de contrôle); ce qui lui permet de reprendre exactement à partir de l’endroit où il s’est arrêté s’il est interrompu.
+
+Auto loader dispose 2 modes pour se tenir informer de l'arrivée d'un ou des nouveaux fichiers dans le stockage cloud afin de traiter de manière incrémentielle tout en continu sans intervention manuelle:
+- **Directory listing mode :** Autoloader fait des scans réguliers dans les répertoires du cloud storage pour s'informer de l'arriver de nouveaux fichiers
+- **File notification mode :** Autoloader utilise les notifications cloud qui annoncent l'arrivée de nouveaux fichiers.Ce mode est plus efficace pour les charges de travail à grande échelle.
+
+Databricks recommande le mode de **file notification mode with file events enabled** sur votre **external location** dans le catalogue Unity. Avec les events de fichier, le Autoloader reçoit des notifications directement lorsque les fichiers arrivent, ce qui réduit la latence et les coûts d’API cloud.
+
+*Pour ingérer des données avec le Auto loader, vous utilisez le **cloudFiles format** avec **spark.readStream.** L’exemple suivant lit les fichiers JSON à partir d’Azure Data Lake Storage et les écrit dans une table de catalogue Unity :*
+
+>
+         base_path = "abfss://container@storage.dfs.core.windows.net/autoloader/orders"
+         schema_path = f"{base_path}/schema"
+         checkpoint_path = f"{base_path}/checkpoint"
+
+         (spark.readStream
+         .format("cloudFiles")
+         .option("cloudFiles.format", "json")
+         .option("cloudFiles.schemaLocation", schema_path)
+         .load("abfss://container@storage.dfs.core.windows.net/incoming/orders/")
+         .writeStream
+         .option("checkpointLocation", checkpoint_path)
+         .trigger(availableNow=True)
+         .toTable("sales.bronze.orders"))
+
+> [!WARNING]
+>
+- **spark.readStream:** Pour la lecture en streaming ou par lot des fichiers stockés dans un Cloud Object Storage
+
+- **.format("cloudFiles"):** La format("cloudFiles") méthode spécifie la nature du stockage(Cloud Object Storage); on a affaire à des cloudFiles.
+
+- **.option("cloudFiles.format", "csv"):** spécifie le type de fichier;
+
+- **.option("cloudFiles.schemaLocation", "/Volumes/retail_q/volumes/blob_source/_schema"):**
+
+- **.option("header", "true"):**
+
+- **.option("inferSchema", "true"):** n’est pas prise en charge pour les sources de streaming, car elle nécessite la lecture de l’ensemble du jeu de données.
+
+- **.load("/Volumes/retail_q/volumes/blob_source/transactions_source/"):**
+
+- **df.writeStream:**
+- 
+- **.outputMode("append"):** Le mode de sortie détermine quels enregistrements sont écrits :
+
+> [!NOTE]
+*append :* seules les nouvelles lignes sont écrites (par défaut pour la plupart des opérations)
+*Update :* les lignes modifiées sont enregistrées
+*complet :* toutes les lignes sont réécrites (utilisées avec des agrégations)
+
+- **.option("checkpointLocation", "/Volumes/retail_q/volumes/blob_source/_checkpoint"):** Le checkpointLocation ou l’emplacement du point de contrôle stocke les informations de progression, ce qui permet au flux de reprendre à partir de l’endroit où il s’est arrêté en cas d’interruption.
+
+- **.trigger(availableNow=True):**
+
+- **.toTable("retail_q.blob_bronze.transactions"):**
 
 > [!WARNING]
 > *Le code généré par genie ne doit pas être directement utilisé; il doit être réadapté car il peut contenir des imperfections:*
@@ -271,8 +398,7 @@ un exemple de writting csv files avec Autoloader reformatté:
     - [ ]  On clique sur **Save & Run** pour terminer la création du **ingestion pipeline** nommé ***salesforce_to_bronze*** qui ingère dans le catalogue ***retail_q*** et le schema ***salesforce_bronze*** de Unity catalog de databricks les tables ***account** et ***opportunity***.
 
 
-Dans le lakeflow connect des des connecteurs sont disponibles pour salesforces, postgres et tant d'autres rendant l'option ***ingestion pipeline (lakeflow connect)*** possible mais un transfert de données d'un volume databricks à un schema (ou élémens internes à Unity catalog) n'est pas disponible car on a affaire à un transfert entre repertoires. On ne peut donc utiliser l'option ingestion pipeline (lakeflow connect) comme on l'a fait tantôt avec salesforce et postgres.Peut dans l'avenir Databricks intégrera un connecteur adapté dans le lakeflow connect.
-Pour pallier à ce problème Databricks dispose d'un outil appelé ***Autoloader*** faisant référence à une ingestion interne à Databricks disponible via notebook.
+
     - [ ]  Delete the file, as now creating pipeline for all tables
     - [ ]  Create new pipeline
     - [ ]  Create new SQL script in SSMS that lists all tables under SalesLT schema
