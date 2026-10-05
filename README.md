@@ -80,37 +80,30 @@ Une modélisation en étoile sera conçue.dans Gold layer on aura une Fact_table
 
 **Goal**: Préparation des étapes de développement à travers des **Backlogs**, **Users stories** et **Sprints** en utilisant **notion** ou **jira**.
 
-</aside>
-- [ ]  **Design the architecture**
-    - [ ]  Read Databricks reference for the project → **LINK**
-    - [ ]  Draw the data lakehouse architecture using draw.io or similar → **LINK**
-- [ ]  **Create GitHub repository** → **LINK**
-- [ ]  **Connect GitHub to Databricks using URL (**Workspace → Create → Git Folder)
-- [ ]  **Create Lakehouse schemas (Unity Catalog) using**UI or SQL**:** `bronze` `silver` `gold`
-- [ ]  **Create a volume inside bronze schema** `raw_sources`
-- [ ]  Upload the 6 CSV files from engineering folder into the Bronze volume → **LINK**
-
 - [ ]  **Environment setup**
       
     - [ ]  **Setup PostgreSQL**
+          
         - [ ]  Use Neon serveless postgres(https://neon.com) et utiliser un google account
         - [ ]  Donner un project name ( retail_project) et choisir une région proche de France
             - [ ]  Copier et coller quelque part le lien d'accès généré(qui sera ultérieurement utilisé)
         - [ ]  Créons les tables sources **product_catalog** et **inventory** dans Postgres en y insérant des données(avec copier coller sur sql editor du code sql disponible dans les fichiers ***01_postgres_product_history.sql*** et ***02_postgres_inventory_history.sql*** disponible dans le dossier ***00_Source_Data*** de ce repos)
     
     - [ ]  **Setup salesforce**
+          
         - [ ]  Use salesforce trial account (30 days free trial)
         - [ ]  Conserver le username reçu par mail and reset the password
         - [ ]  Créons les tables sources **Account** & **Opportunity** en important dans salesforce Accounts et Opportunités(fichiers client & Opportunités) les fichiers ***03_salesforce_accounts_history.csv*** et ***04_salesforce_opportunities_history*** disponible dans le dossier ***00_Source_Data*** de ce repos.
                   
     - [ ]  **Setup Azure blob storage as volume**
-      Azure blob storage, S3, gcp sont des stockages cloude qui peuvent stocker n'importe quel type de données(structured, semi structured, not structured).Nous pouvons créer un volume dans Databricks qui aura les memes caractéristiques de stockage que les clouds.
-        - [ ]  Créer un nouveau schéma(***Volumes*** et y créer un volume ***blob_source*** dans le catalog ***retail_q***
-        - [ ]  On a 2 choix de types de volume(external et managed); on choisit managed pour un volume entierement managé par Unity catalog. On aurait choisi external si on avait un adsl ou s3.
-        - [ ]  Créer un répertoire dans volume nommé ***transactions_source** pour y stocker les fichiers source transactions (***05_blob_transactions_history.csv***) disponibles dans le dossier ***00_Source_Data*** de ce repos)
-        - [ ]  On importe le fichier ***05_blob_transactions_history.csv*** dans le volume
-        - [ ]  Copier le ***path:*** "/Volumes/nom catalog/nom schema/nom volume/nom répertoire correspondant dans notre cas à ***"/Volumes/retail_q/Volumes/blob_source/transactions_source"*** (qui sera ultérieurement utilisé)
-        - [ ]  ***blob_source*** etant disponible dans un volume nous devons l'ingérer dans un nouveau schéma ***blob_bronze** du catalog ***retail_q***.
+          
+  Azure blob storage, S3, gcp sont des stockages cloude qui peuvent stocker n'importe quel type de données(structured, semi structured, not structured).Nous pouvons créer un volume dans Databricks qui aura les memes caractéristiques de stockage que les clouds.
+     - [ ]  Créer un nouveau schéma(***Volumes*** et y créer un volume ***blob_source*** dans le catalog ***retail_q***
+     - [ ]  On a 2 choix de types de volume(external et managed); on choisit managed pour un volume entierement managé par Unity catalog. On aurait choisi external si on avait un adsl ou s3.
+     - [ ]  Créer un répertoire dans volume nommé ***transactions_source** pour y stocker les fichiers source transactions (***05_blob_transactions_history.csv***) disponibles dans le dossier ***00_Source_Data*** de ce repos)
+     - [ ]  On importe le fichier ***05_blob_transactions_history.csv*** dans le volume
+     - [ ]  Copier le ***path:*** "/Volumes/nom catalog/nom schema/nom volume/nom répertoire correspondant dans notre cas à ***"/Volumes/retail_q/Volumes/blob_source/transactions_source"*** (qui sera ultérieurement utilisé)
+     - [ ]  ***blob_source*** etant disponible dans un volume nous devons l'ingérer dans un nouveau schéma ***blob_bronze** du catalog ***retail_q***.
 
 > [!NOTE]
 > 
@@ -122,8 +115,23 @@ Une modélisation en étoile sera conçue.dans Gold layer on aura une Fact_table
 Pour pallier à ce problème Databricks dispose d'un outil appelé ***Auto loader*** faisant référence à une ingestion interne à Databricks disponible via notebook.
 Nous utiliserons les connecteurs managés de lakeflow connect pour créer 2 pipelines d'ingestion pour les données sources de Salesforces et Neon postgreSQL; pour ce qui est des données qui sont le volume de Databricks on utilisera Auto loader à travers un code personnalisé sur notebook python.*
 
+**Result:** Project is ready to start building Bronze, Silver, and Gold layers.
+
+</aside>
+
+---
+> [!NOTE]
+> ## 🥉 Phase2 - Building Bronze Layers(postgres_bronze, salesforce_bronze, blob_bronze)
+
+<aside>
+
+**Goal**: Build the Bronze layers by ingesting all raw CSV files into Delta tables without any kind of transformations. Nous avons un catalog (***retail_q***) dans lequel des schemas bronze sont dédiés à chacune de nos sources:  ***postgres_bronze, salesforce_bronze, blob_bronze*** pour y stocker nos données sources à l'etat brut.
+
+</aside>
+
 - [ ]   **Data Ingestion pipeline from Postgres with Lakeflow connect(phase 1)**
     - [ ]  Launch Databricks workspace
+    - [ ]  Create catalog ***retail_q*** et schémas ***postgres_bronze*** for source coming from postgresSQL
     - [ ]  Go to Jobs & Pipelines -> Ingestion pipeline(correspondant au *Lakeflow connect* dans le repos)
     - [ ]  **Step 1/5 : Connexion**
         - [ ]  Parmi toutes les sources disponible on clique sur postgreSQL
@@ -155,6 +163,7 @@ Nous utiliserons les connecteurs managés de lakeflow connect pour créer 2 pipe
     - [ ]  On clique sur **Save & Run** pour terminer la création du **ingestion pipeline** nommé ***postgres_to_bronze*** qui ingère dans le catalogue ***retail_q*** et le schema ***postgres_bronze*** de Unity catalog de databricks les tables ***product_catalog*** et ***inventory***.
 
 - [ ]  **Data Ingestion pipeline from Salesforce with Lakeflow connect(phase 2)**
+    - [ ]  Create schémas ***salesforce_bronze*** for source coming from salesforce
     - [ ]  Go to Jobs & Pipelines -> Ingestion pipeline(correspondant au *Lakeflow connect* dans le repos)
     - [ ]  **Step 1/5 : Connexion**
         - [ ]  Parmi toutes les sources disponible on clique sur Salesforce
@@ -176,19 +185,24 @@ Nous utiliserons les connecteurs managés de lakeflow connect pour créer 2 pipe
     - [ ]  Les notifications ne sont configurées qu'avec **failure** afin de ce recevoir un email en cas d'echec de pipeline execution.
     - [ ]  On clique sur **Save & Run** pour terminer la création du **ingestion pipeline** nommé ***salesforce_to_bronze*** qui ingère dans le catalogue ***retail_q*** et le schema ***salesforce_bronze*** de Unity catalog de databricks les tables ***account** et ***opportunity***.
 
-
 - [ ]  **Data Ingestion pipeline from Volume with Autoloader(phase 3)**
-    - [ ]  **Step 1/5 : Create a folder & notebooks**
+    - [ ]  Create a folder in the repository called ***01_Notebook*** to store all scripts inside it
+    - [ ]  **Step 1/3 : Create a folder & notebooks**
         - [ ]  Go to Databricks workspace -> Create new folder nommé ***retail_q*** dans le workspace où l'on stokera tout ce qui est important(notebooks,...)
         - [ ]  Create notebook nommé ***blob_to_bronze***
-        - [ ]  Create manually a schema ***blob_bronze*** in ***retail_q*** catalog 
-    - [ ]  **Step 2/5 : Autoloader code with genie**
-        - [ ]  Ecrire le Autoloader code pour ingérer les fichiers
+              
+    - [ ]  **Step 2/3 : Read & Write with Autoloader (code genie)**
+        - [ ]   Read the ***05_blob_transactions_history.csv*** file se trouvant dans le volume ***transactions_source** into a DataFrame
+        - [ ]   Write the DataFrame to a table in the Bronze schema ***blob_bronze*** using overwrite mode.
         - [ ]  Il est conseillé d'utiliser Genie code pour gagner du temps(Genie dispose 2 variants: **Agent**(run multi step data and AI tasks- ***changer le code du notebook***) & **Chat**(Asking question about your code).
         - [ ]  Choisir Agent et saisir les questions(ce qu'on souhaite faire) dans le prompt.
+        - [ ]  Run the script and query the bronze table to verify it is loaded correctly
+        - [ ]  Run the whole notebook to see if everything works successfully.
+   - [ ]  **Step 3/3 : Push & commit github**
+        - [ ]  Commit & Push your changes to the GitHub repository
 
 > [!IMPORTANT]
-> **Goal of the question :** For reading csv files from source and write them into target schema using Auto loader
+> **Goal of the question in genie:** For reading csv files from source and write them into target schema using Auto loader
 > 
 > **Question 1:** We are getting csv files at ***"/Volumes/retail_q/Volumes/blob_source/transactions_source"***
 > 
@@ -233,185 +247,14 @@ Nous utiliserons les connecteurs managés de lakeflow connect pour créer 2 pipe
 > **Auto Loader:** *Auto Loader (via format("cloudFiles")) est l'outil recommandé par Databricks pour ingérer en continu ou par lots des fichiers volumineux stockés dans un Cloud Object Storage (Databrick's Volumes, S3, ADLS, GCS). Nos sources sont dans un volume de Databricks et notre cible dans un schemas de Unity Catalog de Databricks. Sa force se trouve dans sa capacité à détecter et traiter automatiquement les nouveaux fichiers avec l’évolution du schéma*.
 
 
-
 > [!NOTE]
 > **Rappel sur Ingesting data into the Unity catalog:**
 > 
 > Les notebooks dans Azure Databricks fournissent une approche flexible, pilotée par le code, pour ingérer des données provenant de diverses sources. Lorsque les outils graphiques comme lakeflow connect ne répondent pas à vos besoins ou que vous avez besoin d’une logique personnalisée pour la transformation des données, les notebooks vous permettent de contrôler complètement le processus d’ingestion(**Ingesting batch and streaming data using notebooks with DataFrames and Structured Streaming**).
 > Les codes python (read & write) pour ingérer des données à l’aide de notebooks varient selon les scénarios de traitement (par lots, de streaming) et l'emplacement de stockage(hors Cloud/Cloud Object Storage).
 
- **Ingérer des données par lots avec des DataFrames**
 
- **Reading files**
-
-    >  # Reading csv files**
-
-     df = (spark.read
-    .format("csv")
-    .option("header", "true")
-    .option("inferSchema", "true")
-    .load("/Volumes/catalog/schema/volume/data.csv"))
-
-    # Reading from different file formats
-    
-    # Read JSON files
-     df_json = spark.read
-     .format("json")
-     .load("/path/to/data.json")
-
-    # Read Parquet files (columnar format, efficient for analytics)
-    df_parquet = spark.read
-    .format("parquet")
-    .load("/path/to/data.parquet")
-
-    # Read XML files (requires rowTag option)
-    df_xml = (spark.read
-    .format("xml")
-    .option("rowTag", "record")
-    .load("/path/to/data.xml"))
-
-**Writing files**
-
-    > # Reading csv files**
-     df.write
-       .mode("overwrite")
-       .saveAsTable("catalog.schema.table_name")
-
- **Ingesting streaming data with Structured Streaming**
-
- Au lieu d'utiliser **spark.read**, vous utilisez **spark.readStream** pour créer un DataFrame de streaming qui traite les nouvelles  données de manière incrémentielle. L’exemple suivant lit les données de streaming à partir de Kafka :
-
-**Reading files**
-
-    > # Reading from kafka
-     df_stream = (spark.readStream
-    .format("kafka")
-    .option("kafka.bootstrap.servers", "broker:9092")
-    .option("subscribe", "topic-name")
-    .option("startingOffsets", "latest")
-    .load())
- 
-**Ingesting data with Spark Structured Streaming like Delta lake Unity catalog**
-
-Vous pouvez également diffuser en continu à partir de sources de fichiers à mesure que de nouveaux fichiers arrivent dans un répertoire (volume):
-**Reading data from volume unity catalog**
-Utilisez **readStream** pour lire les fichiers en continue
-    > 
-     df_file_stream = (spark.readStream
-    .format("csv")
-    .option("header", "true")
-    .schema(defined_schema)
-    .load("/Volumes/catalog/schema/volume/incoming/"))
-
-**Writing data to Unity catalog tables**
-Utilisez **writeStream** pour conserver les données de streaming dans les tables du Unity Catalog :
-
-  >
-     (df_stream
-    .writeStream
-    .format("delta")
-    .outputMode("append")
-    .option("checkpointLocation", "/checkpoints/my-stream")
-    .toTable("catalog.schema.streaming_table"))
-
-
-   - [ ]  **Step 3/5 : Validating pipeline configuration**
-        - [ ]  Spécifier la database, le schema et les 2 tables source à ingérer
-        - [ ]  Cocher ***history tracking*** en **ON ou OFF**définit le choix entre  ***batch et incrementielle ingestion***
-        - [ ]  Pas besoin de préciser un ***cursor column*** sur Salesforce car c'est déja intégré la colonne pour définir la colonne ***incrémentielle*** de la table ***account***
-        - [ ]  Pour la table ***opportunity*** mettre ***history tracking*** en **OFF**.
-  - [ ]  **Step 4/5 : Spécifier où stocker les données ingérées dans Databricks**
-     - [ ]  Choisir le catalog ***retail_q*** et le schémas ***sales_bronze***
-  - [ ]  **Step 5/5 : Schedules(run planification) & Notifications**
-    - [ ]  Add a trigger to run the job on a schedule (for example daily)
-    - [ ]  Pour l'instant nous supprimons le schedule de défaut qu'on configurera plus tard en fonction des besoins d'execution
-    - [ ]  Les notifications ne sont configurées qu'avec **failure** afin de ce recevoir un email en cas d'echec de pipeline execution.
-    - [ ]  On clique sur **Save & Run** pour terminer la création du **ingestion pipeline** nommé ***salesforce_to_bronze*** qui ingère dans le catalogue ***retail_q*** et le schema ***salesforce_bronze*** de Unity catalog de databricks les tables ***account** et ***opportunity***.
-
-
-
-    - [ ]  Delete the file, as now creating pipeline for all tables
-    - [ ]  Create new pipeline
-    - [ ]  Create new SQL script in SSMS that lists all tables under SalesLT schema
-**SELECT
-s.name AS SchemaName,
-t.name AS TableName
-FROM sys.tables t
-INNER JOIN sys.schemas s
-ON t.schema_id = s.schema_id
-WHERE s.name = 'SalesLT'**
-
-So on pipeline create lookup activity, settings make a new source dataset and don’t select a specific table and use query option and copy the script (and uncheck first row only)
-    - [ ]  Run debug and look at inputs outputs on output – see its in json
-    - [ ]  Create forecah activity and connect on success
-    - [ ]  On settings click items -> dynamic -> activity outputs for look for all tables -> add .values (which is the json list output)
-    - [ ]  Update activities -> click pencil -> in foreach place copydata -> use SqlDBTables but select query and add dynamic content and insert:
-**@{concat('SELECT * FROM ', item().SchemaName, '.', item().TableName )} // remember the space after from!!**
-    - [ ]  Sink select the same parquet
-We want it in format bronze/Schema/Tablename/Tablename.parquet so we make a new Parquet sink and select parameters where we can leverage the item() we used for the source. Now go back to the sink and update value to dynamic content and put in the relevant item() – make sure to use @
-Now go back to parquet and under connection -> file path, update directory to @{concat( <<schema>>, ‘/’, <<table>>)}
-And for file concat the tablename and .parquet
-Validate and publish, go back to outer pipeline
-We can either debug or trigger, so lets add trigger to trigger now
-Click on link and can go monitor pipeline, each foreach is running concurrently as seen on gantt (if you need to make any changes, ensure you publish before triggering)
-NEED TO UPDATE SSMS QUERY FOR mrk PRIVILEGES:
-USE AdventureWorksLT2019;
-GRANT SELECT ON SCHEMA::SalesLT TO mrk;
-Since we made a change not in azure, we can click rerun pipeline in top left
-Now you can see the files and directories in storage account
-•	If you get an empty file:
-“Azure blob storage does not support having empty folders. Thus, when you try to create folders (or empty folders), there will be a duplicate empty file. 
-•	It is a blob storage with hierrachial namespace disabled-is that the cause? Yes, enabling hierarchical workspace will enable azure data lake which supports file and directory semantics and therefore which wouldn't create that additional file.”
-•	E.g. https://stackoverflow.com/questions/76074718/additional-empty-blob-created-with-folder-names-in-azure-storage-container-not-a 
-
-- [ ]  **Design the architecture**
-    - [ ]  Read Databricks reference for the project → **LINK**
-    - [ ]  Draw the data lakehouse architecture using draw.io or similar → **LINK**
-- [ ]  **Create GitHub repository** → **LINK**
-- [ ]  **Connect GitHub to Databricks using URL (**Workspace → Create → Git Folder)
-- [ ]  **Create Lakehouse schemas (Unity Catalog) using**UI or SQL**:** `bronze` `silver` `gold`
-- [ ]  **Create a volume inside bronze schema** `raw_sources`
-- [ ]  Upload the 6 CSV files from engineering folder into the Bronze volume → **LINK**
-
-<aside>
-
-**Result:** Project is ready to start building Bronze, Silver, and Gold layers.
-
-</aside>
-
----
-> [!NOTE]
-> ## 🥉 Phase2 - Building Bronze Layer
-
-<aside>
-
-**Goal**: Build the Bronze layer by ingesting all raw CSV files into Delta tables without any kind of transformations.
-
-</aside>
-
-- [ ]  Create a folder in the repository called `bronze` to store all scripts inside it
-- [ ]  **Create Bronze notebook**
-- [ ]  **Initial ingestion (manual)** For each of the 6 CSV files:
-    - [ ]  Read the CSV into a DataFrame
-    - [ ]  Write the DataFrame to a table in the Bronze schema using overwrite mode, and use a source-system prefix in the table name (for example `erp_` or `crm_`) to clearly identify where the data comes from.
-    - [ ]  Run the script and query the bronze table to verify it is loaded correctly
-- [ ]  Run the whole notebook to see if everything works successfully.
-- [ ]  Commit & Push your changes to the GitHub repository
-
-<aside>
-🔥
-
-**Bonus Advanced Task**
-
-**Code review &** Identify repeated logic
-
-- Create a dictionary to store file paths and table names
-- Loop through the dictionary to ingest all files
-</aside>
-
-<aside>
-
-**Result**: All 6 raw source files are ingested into dedicated Bronze tables with no transformations applied.
+**Result**: All 6 raw source files(***product_catalog, inventory,account, opportunity et transaction*** are ingested into there dedicated Bronze tables with no transformations applied.
 
 </aside>
 
