@@ -81,6 +81,14 @@ Une modélisation en étoile sera conçue.dans Gold layer on aura une Fact_table
 **Goal**: Préparation des étapes de développement à travers des **Backlogs**, **Users stories** et **Sprints** en utilisant **notion** ou **jira**.
 
 </aside>
+- [ ]  **Design the architecture**
+    - [ ]  Read Databricks reference for the project → **LINK**
+    - [ ]  Draw the data lakehouse architecture using draw.io or similar → **LINK**
+- [ ]  **Create GitHub repository** → **LINK**
+- [ ]  **Connect GitHub to Databricks using URL (**Workspace → Create → Git Folder)
+- [ ]  **Create Lakehouse schemas (Unity Catalog) using**UI or SQL**:** `bronze` `silver` `gold`
+- [ ]  **Create a volume inside bronze schema** `raw_sources`
+- [ ]  Upload the 6 CSV files from engineering folder into the Bronze volume → **LINK**
 
 - [ ]  **Environment setup**
       
