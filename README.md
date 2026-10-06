@@ -270,7 +270,7 @@ Nous allons utiliser la composante ***Lakeflow spark declarative pipeline*** pou
 
 </aside>
 
-- [ ]  **ETL pipeline for cleaning & transforming using Lakeflow spark declarative pipeline (phase 3)**
+- [ ]  **ETL pipeline for cleaning & transforming using Lakeflow spark declarative pipeline**
     - [ ]  **Step 1/5: Github setup**
         - [ ]  Create repository structure
         - [ ]  Create a folder called ***00_Bronze_to_silver*** pour y stocker les notebooks de lakeflow spark declarative pipeline pour chaque table.
@@ -443,9 +443,6 @@ Nous allons utiliser la composante ***Lakeflow spark declarative pipeline*** pou
 <img width="996" height="618" alt="image" src="https://github.com/user-attachments/assets/24c6e51d-bd83-4824-8f4a-95974ad71da5" />
 
 
-
-
-
 <aside>
 
 **Result:** All Bronze tables are transformed into analytics-ready Silver tables with validated data quality and standardized structure using Lakeflow spark declarative pipeline.
@@ -461,22 +458,62 @@ Nous allons utiliser la composante ***Lakeflow spark declarative pipeline*** pou
 **Goal**: Dissocier le modèle de données des systèmes sources et mettre en place un nouveau modèle adapté à la Business Intelligence et à l'analyse de données.
 
           Nous utiliserons la modélisation dimensionnelle pour transformer les tables « Silver » ***inventory, account, opportunity,transactions*** en un schéma en étoile composé de tables de ***fact*** et de tables de ***dimensions***.
-          
+          <img width="692" height="524" alt="image" src="https://github.com/user-attachments/assets/a704457f-6a67-4467-b0cb-3c7a1de84e56" />
+- On va joindre les tables Transactions et opportunity pour avoir la ***fact table***
+- Pour les tables de dimensions on aura ***dim_customer, dim_product et dim_calendar***. La table inventory ne fera pas parti du modèle.
+  
 </aside>
-
-- [ ]  Data Modeling Phase
-    - [ ]  Understand the content of each Silver table
-    - [ ]  Map each table to a business object such as customers, products, or sales
-    - [ ]  Use draw.io to design the target data model. Example: `fact_sales`, `dim_customers`, `dim_products`
-- [ ]  Build Gold tables - For each table in the new model:
-    - [ ]  Write an SQL query
-        - [ ]  Join all relevant Silver tables for the dimension or fact
-        - [ ]  Ensure no duplicates after joins
-        - [ ]  Validate the query output
-    - [ ]  Load the result into a DataFrame
-    - [ ]  Write the DataFrame to a new Gold table using a clear naming prefix such as `dim_` for dimension tables or `fact_` for fact tables.
-    - [ ]  Sanity checks of gold table after writing
-- [ ]  Commit & Push your changes to the GitHub repository
+ 
+- [ ]  ***Data Modeling using Lakeflow spark declarative pipeline***
+    - [ ]  ***Step 1/4 : Data model preparation***
+          
+        - [ ]  Comprendre le contenu de chaque Silver table
+        - [ ]  Map each table to a business object such as customers, products, or sales
+        - [ ]  Utiliser draw.io pour dessiner le data model cible. Example: `fact_sales`, `dim_customers`, `dim_products`, `dim_calendar
+              
+    - [ ]  ***Step 2/4: Github setup**
+          
+        - [ ]  Create repository structure
+        - [ ]  Create a folder called ***0_Silver_to_gold*** pour y stocker les notebooks de lakeflow spark declarative pipeline pour chaque table.
+              
+   - [ ]  ***Step 3/4: Build Gold tables - For each table in the new model:***
+         
+       - [ ]  For each Bronze table (4 tables)
+           - [ ]  Go to Jobs & Pipelines -> Etl pipeline ->***retail_transformation -> edit pipeline*** :
+           - [ ]  Créer un nouveau folder nommé ***Silver_to_gold***
+           - [ ]  On va créer dans le folder **silver_to_gold*** des ***fichiers.py*** devant servir de code pour chacune des tables de dimension et de fact.i.e: ***dim_product.py,dim_product.py,fact_sales.py***
+           - [ ]  Usage des def function est très pratique:
+           - [ ]  Créer 2 dataframes: transaction_df & opportunity_df 
+           - [ ]  Join all relevant Silver tables for the dimension or fact( Transaction & opportunity
+           - [ ]  Créer un dataframe ***join_df(issu des 2 premiers)***
+           - [ ]  Créer un autre dataframe ***selected_df*** auquel on applique le ***Return*** pour récupérer les colonnes pertinentes avec des noms en minuscules
+           - [ ]  S'assurer qu'il n'y ait pas de doublons after joins
+         
+         >
+               def account_clean():
+                   # Read source streaming table
+                   source_df = spark.readStream.table("retail_q.salesforce_bronze.account")
+    
+                  # Sélectionner les colonnes pertinentes avec des noms en minuscules.
+                    return source_df.select(
+                    F.col("Id").alias("id"),
+                    F.col("IsDeleted").alias("is_deleted"),
+                    F.upper(F.trim(F.col("Name"))).alias("customer_name"),
+                    F.col("Type").alias("type")
+                  )
+        >
+        
+         
+      - Avant d'aller sur les transformation suivantes il faut toujours checker le résultat avec “df.display()”
+       - [ ]  Effectue des vérifications de cohérence sur le DataFrame final avant l'écriture.
+         
+      
+           - [ ]  Validate the query output
+       - [ ]  Load the result into a DataFrame
+       - [ ]  Write the DataFrame to a new Gold table using a clear naming prefix such as `dim_` for dimension tables or `fact_` for fact tables.
+       - [ ]  Sanity checks of gold table after writing
+             
+   - [ ]  ***Step 4/4:Commit & Push your changes to the GitHub repository***
 
 <aside>
 🔥
