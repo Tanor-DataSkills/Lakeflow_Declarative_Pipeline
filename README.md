@@ -194,7 +194,7 @@ Nous utiliserons les connecteurs managés de lakeflow connect pour créer 2 pipe
     - [ ]  **Step 2/3 : Read & Write with Autoloader (code genie)**
         - [ ]   Read the ***05_blob_transactions_history.csv*** file se trouvant dans le volume ***transactions_source** into a DataFrame
         - [ ]   Write the DataFrame to a table in the Bronze schema ***blob_bronze*** using overwrite mode.
-        - [ ]  Il est conseillé d'utiliser Genie code pour gagner du temps(Genie dispose 2 variants: **Agent**(run multi step data and AI tasks- ***changer le code du notebook***) & **Chat**(Asking question about your code).
+        - [ ]  Il est conseillé d'utiliser Genie code pour gagner du temps(Genie dispose 2 variants: **Agent**(run multi step data and AI tasks- ***changer le code du notebook***) & **Chat**(Asking question about your code).Pensez à bien vérifier le resultat de genie 
         - [ ]  Choisir Agent et saisir les questions(ce qu'on souhaite faire) dans le prompt.
         - [ ]  Run the script and query the bronze table to verify it is loaded correctly
         - [ ]  Run the whole notebook to see if everything works successfully.
@@ -260,43 +260,72 @@ Nous utiliserons les connecteurs managés de lakeflow connect pour créer 2 pipe
 
 ---
 > [!NOTE]
-> ## 🥈 Phase3 - Building Silver Layer
+> ## 🥈 Phase3 - Building Silver Layer (Data Cleaning & Transformation)
 
 <aside>
 
 **Goal**: It is time to clean and transform our bronze data and load the clean results into silver layer. This is usually the most time consuming phase of the project and the fun part!
 
+Nous allons utiliser la composante ***Lakeflow spark declarative pipeline*** pour faire les transformations afin d'avoir Silver & gold layers. Nous créerons un ETL pipeline pour chacune de nos 4 tables sources.
+
 </aside>
 
-- [ ]  Create repository structure
-    - [ ]  Create a folder called `silver`
-    - [ ]  Create two subfolders:  `crm` `erp`
-- [ ]  For each Bronze table (6 tables)
-    - [ ]  Create a Silver notebook `silver_<source>_<table_name>` e.g.  `silver_crm_cust_info`
-    - [ ]  Analyze data quality using SQL and List all identified issues
+- [ ]  **ETL pipeline for cleaning & transforming using Lakeflow spark declarative pipeline (phase 3)**
+- [ ]  **Step 1/5: Github setup**
+    - [ ]  Create repository structure
+    - [ ]  Create a folder called ***00_Bronze_to_silver*** pour y stocker les notebooks de lakeflow spark declarative pipeline pour chaque table.
+- [ ]  **Step 2/5: Etl pipeline setup**
+    - [ ]  For each Bronze table (4 tables)
+        - [ ]   Create dans le catalog ***retail_q*** le schémas ***retail_silver*** pour les tables transformées venant de toutes les bronze layers
+        - [ ]   Go to Jobs & Pipelines -> Etl pipeline -> configure the blank pipeline :
+        - [ ]   Attribuer un nom au pipeline nommé ***retail_transformation***
+        - [ ]   Un folder est créé par defaut nommé transformations qu'on renomme ***bronze_to_silver***
+        - [ ]   On va créer dans le folder **bronze_to_silver*** des ***fichiers.py*** devant servir de code pour chacune des tables à transformer.i.e: ***Product_catalog.py,inventory,account.py,opportunity.py,transactions.py***
+- [ ]   **Step 3/5: Write code transformation using genie**
+    - [ ]  ***Data Quality check using @dp.expect_all_or_drop & @dp.expect***
+                   
+          - ***@dp.expect_all_or_drop("valid_column", "rules")*** est pour appliquer des règles data quality sur les colonnes et supprimer les lignes ne respectant pas les conditions i.e: @dp.expect_all_or_drop("valid_price", "unit_price > 0")
+          - ***@dp.expect("colonne", "rules")*** est pour appliquer des règles data quality sur les colonnes sans supprimer les lignes ne respectant les règles.
+  
         - [ ]  Find duplicates
         - [ ]  Validate string values: Check extra spaces, Identify abbreviations to normalize
         - [ ]  Validate dates values: Check Data Type, check the format, handle missing values
         - [ ]  Validate numeric values
         - [ ]  Standardize business key IDs to ensure tables can be joined correctly.
         - [ ]  Check the name of columns and table and make a plan how to rename them to something friendly.
-    - [ ]  Section 1: Read data Bronze Table and Load it into a DataFrame
-    - [ ]  Section 2: Transform data
-        - Fix issues one by one
-        - Keep transformations small and clear
-        - Avoid one large transformation block
-        - Use Spark SQL or PySpark (Python)
-        - Before going to next transformation always check the result “df.display()”
-    - [ ]  Sanity checks the final DataFrame before writing
-    - [ ]  Section 3: Write the DataFrame to a new Silver Table and use a friendly name for the new table
-    - [ ]  Sanity checks of silver table after writing
-    - [ ]  Finalize notebook
-        - [ ]  Run the full notebook end to end
-        - [ ]  Review structure and readability
-        - [ ]  Add comments and documentation
-        - [ ]  Clone the notebook as a template for the next table
-    - [ ]  Commit & Push your changes to the GitHub repository
+    - [ ]  ***Section 1: Read data Bronze Table and Load it into a DataFrame***
+    - [ ]  ***Section 2: Standardize operations - Transform data***
+               - Fix issues one by one
+               - Garder les transformations petites et claires
+               - Eviter une large bloque de transformation
+               - Use Spark SQL or PySpark (Python)
+               - Usage des def function est très pratique:
+           def product_catalog():
+           return (
+               - Avant d'aller sur les transformation suivantes il faut toujours checker le résultat avec “df.display()”
+        - [ ]  Effectue des vérifications de cohérence sur le DataFrame final avant l'écriture.
+    - [ ]  ***Section 3: Write the DataFrame to a new Silver Table and use a friendly name for the new table***
+        - [ ]  Sanity checks of silver table after writing
+        - [ ]  Finalize notebook
+            - [ ]  Run the full notebook end to end
+            - [ ]  Review structure and readability
+            - [ ]  Add comments and documentation
+            - [ ]  Clone the notebook as a template for the next table
+    - [ ]  ***Commit & Push your changes to the GitHub repository***
 
+
+> [!IMPORTANT]
+> **Goal of the question in genie:** Create silver layer table in spark lakeflow declarative pipeline
+> 
+> **Question 2:** read the table ***retail_q.postgres_bronze.product_catalog***, apply generic standardization operations, apply some ***data quality rules*** then write the output ***"retail_q.retail_silver.product_catalog"***
+> 
+>  **Answer 1:**
+
+
+      >  genie output ( cf 01_blob_to_bronze.py file)
+      
+        # Databricks notebook source
+        
 <aside>
 🔥
 
