@@ -294,6 +294,18 @@ Nous allons utiliser la composante ***Lakeflow spark declarative pipeline*** pou
         - [ ]  Standardize business key IDs to ensure tables can be joined correctly.
         - [ ]  Check the name of columns and table and make a plan how to rename them to something friendly.
     - [ ]  ***Section 1: Read data Bronze Table and Load it into a DataFrame***
+
+ >  genie output ( cf 01_blob_to_bronze.py file)
+
+            ***def account_clean():***
+          #Read source streaming table
+          source_df = spark.readStream.table("retail_q.salesforce_bronze.account")
+         #Select core business columns with lowercase underscore naming
+         return source_df.select(
+         F.col("Id").alias("id"),
+         F.col("IsDeleted").alias("is_deleted")
+         )
+
     - [ ]  ***Section 2: Standardize operations - Transform data***
                - Fix issues one by one
                - Garder les transformations petites et claires
