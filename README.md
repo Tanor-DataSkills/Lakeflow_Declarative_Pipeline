@@ -89,7 +89,7 @@ Une modélisation en étoile sera conçue.dans Gold layer on aura une Fact_table
             - [ ]  Copier et coller quelque part le lien d'accès généré(qui sera ultérieurement utilisé)
         - [ ]  Créons les tables sources **product_catalog** et **inventory** dans Postgres en y insérant des données(avec copier coller sur sql editor du code sql disponible dans les fichiers ***01_postgres_product_history.sql*** et ***02_postgres_inventory_history.sql*** disponible dans le dossier ***00_Source_Data*** de ce repos)
     
-    - [ ]  **Setup salesforce**
+    - [ ]  **Setup Salesforce**
           
         - [ ]  Use salesforce trial account (30 days free trial)
         - [ ]  Conserver le username reçu par mail and reset the password
