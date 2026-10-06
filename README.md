@@ -283,10 +283,27 @@ Nous allons utiliser la composante ***Lakeflow spark declarative pipeline*** pou
         - [ ]   On va créer dans le folder **bronze_to_silver*** des ***fichiers.py*** devant servir de code pour chacune des tables à transformer.i.e: ***Product_catalog.py,inventory,account.py,opportunity.py,transactions.py***
 - [ ]   **Step 3/5: Write code transformation using genie**
     - [ ]  ***Data Quality check using @dp.expect_all_or_drop & @dp.expect***
-                   
-          - ***@dp.expect_all_or_drop("valid_column", "rules")*** est pour appliquer des règles data quality sur les colonnes et supprimer les lignes ne respectant pas les conditions i.e: @dp.expect_all_or_drop("valid_price", "unit_price > 0")
-          - ***@dp.expect("colonne", "rules")*** est pour appliquer des règles data quality sur les colonnes sans supprimer les lignes ne respectant les règles.
-  
+             
+      -  ***@dp.expect_all_or_drop("valid_column", "rules")*** est pour appliquer des règles data quality sur les colonnes et supprimer les lignes ne respectant pas les conditions i.e: @dp.expect_all_or_drop("valid_price", "unit_price > 0")
+        
+      -  ***@dp.expect("colonne", "rules")*** est pour appliquer des règles data quality sur les colonnes sans supprimer les lignes ne respectant les règles.
+
+           >
+          
+               from pyspark import pipelines as dp
+               from pyspark.sql import functions as F
+ 
+               @dp.table(
+               name="retail_q.retail_silver.product_catalog",
+               comment="Silver layer product catalog with standardized data and data quality rules"
+               )
+               @dp.expect_or_drop("valid_product_id", "product_id IS NOT NULL AND LENGTH(TRIM(product_id)) > 0")
+               @dp.expect_or_drop("valid_product_name", "product_name IS NOT NULL AND LENGTH(TRIM(product_name)) > 0")
+               @dp.expect("valid_category", "category IS NOT NULL")
+               @dp.expect("valid_price", "unit_price > 0")
+               @dp.expect_or_drop("valid_launch_date", "launch_date IS NOT NULL")
+               @dp.expect("valid_supplier", "supplier_name IS NOT NULL")
+          >
         - [ ]  Find duplicates
         - [ ]  Validate string values: Check extra spaces, Identify abbreviations to normalize
         - [ ]  Validate dates values: Check Data Type, check the format, handle missing values
@@ -294,8 +311,10 @@ Nous allons utiliser la composante ***Lakeflow spark declarative pipeline*** pou
         - [ ]  Standardize business key IDs to ensure tables can be joined correctly.
         - [ ]  Check the name of columns and table and make a plan how to rename them to something friendly.
     - [ ]  ***Section 1: Read data Bronze Table and Load it into a DataFrame***
-
- <img width="875" height="338" alt="image" src="https://github.com/user-attachments/assets/faf138d8-c857-4c26-b076-ffc323713479" />
+                - Create df function nommée ***def table_clean:***
+                - Create source_df qui lit la table avec source_df = spark.readStream.table("catalog.schema_bronze.table")
+                - Appliquer le ***Return au source_df.select() pour récupérer le source_df avec des champs qu'on choisi***
+ 
 
   - [ ]  ***Section 2: Standardize operations - Transform data***
                - Fix issues one by one
@@ -303,18 +322,18 @@ Nous allons utiliser la composante ***Lakeflow spark declarative pipeline*** pou
                - Eviter une large bloque de transformation
                - Use Spark SQL or PySpark (Python)
                - Usage des def function est très pratique:
-           def product_catalog():
-           return (
+         <img width="875" height="338" alt="image" src="https://github.com/user-attachments/assets/faf138d8-c857-4c26-b076-ffc323713479" />
                - Avant d'aller sur les transformation suivantes il faut toujours checker le résultat avec “df.display()”
-        - [ ]  Effectue des vérifications de cohérence sur le DataFrame final avant l'écriture.
-    - [ ]  ***Section 3: Write the DataFrame to a new Silver Table and use a friendly name for the new table***
-        - [ ]  Sanity checks of silver table after writing
-        - [ ]  Finalize notebook
-            - [ ]  Run the full notebook end to end
-            - [ ]  Review structure and readability
-            - [ ]  Add comments and documentation
-            - [ ]  Clone the notebook as a template for the next table
-    - [ ]  ***Commit & Push your changes to the GitHub repository***
+      - [ ]  Effectue des vérifications de cohérence sur le DataFrame final avant l'écriture.
+         
+  - [ ]  ***Section 3: Write the DataFrame to a new Silver Table and use a friendly name for the new table***
+       - [ ]  Sanity checks of silver table after writing
+       - [ ]  Finalize notebook
+          - [ ]  Run the full notebook end to end
+          - [ ]  Review structure and readability
+          - [ ]  Add comments and documentation
+          - [ ]  Clone the notebook as a template for the next table
+  - [ ]  ***Commit & Push your changes to the GitHub repository***
 
 
 > [!IMPORTANT]
@@ -322,12 +341,75 @@ Nous allons utiliser la composante ***Lakeflow spark declarative pipeline*** pou
 > 
 > **Question 2:** read the table ***retail_q.postgres_bronze.product_catalog***, apply generic standardization operations, apply some ***data quality rules*** then write the output ***"retail_q.retail_silver.product_catalog"***
 > 
->  **Answer 1:**
+>  **Answer 2:**
 
 
-      >  genie output ( cf 01_blob_to_bronze.py file)
+      >  genie output ( cf product_catalog.py)
       
-        # Databricks notebook source
+           from pyspark import pipelines as dp
+           from pyspark.sql import functions as F
+     
+          @dp.table(
+              name="retail_q.retail_silver.product_catalog",
+              comment="Silver layer product catalog with standardized data and data quality rules"
+         )
+        @dp.expect_or_drop("valid_product_id", "product_id IS NOT NULL AND LENGTH(TRIM(product_id)) > 0")
+        @dp.expect_or_drop("valid_product_name", "product_name IS NOT NULL AND LENGTH(TRIM(product_name)) > 0")
+        @dp.expect("valid_category", "category IS NOT NULL")
+        @dp.expect("valid_price", "unit_price > 0")
+        @dp.expect_or_drop("valid_launch_date", "launch_date IS NOT NULL")
+        @dp.expect("valid_supplier", "supplier_name IS NOT NULL")
+        def product_catalog():
+        return (
+        spark.readStream.table("retail_q.postgres_bronze.product_catalog")
+        .select(
+            # Standardize product_id: trim and uppercase
+            F.upper(F.trim(F.col("product_id"))).alias("product_id"),
+            
+            # Standardize product_name: trim and title case
+            F.initcap(F.trim(F.col("product_name"))).alias("product_name"),
+            
+            # Standardize category: trim and title case
+            F.initcap(F.trim(F.col("category"))).alias("category"),
+            
+            # Standardize subcategory: trim and title case, handle nulls
+            F.when(F.col("subcategory").isNotNull(), 
+                   F.initcap(F.trim(F.col("subcategory"))))
+             .otherwise(F.lit("Unknown")).alias("subcategory"),
+            
+            # Standardize brand: trim and title case, handle nulls
+            F.when(F.col("brand").isNotNull(), 
+                   F.initcap(F.trim(F.col("brand"))))
+             .otherwise(F.lit("Unknown")).alias("brand"),
+            
+            # Standardize price: round to 2 decimal places
+            F.round(F.col("unit_price"), 2).alias("unit_price"),
+            
+            # Standardize supplier_name: trim and title case
+            F.initcap(F.trim(F.col("supplier_name"))).alias("supplier_name"),
+            
+            # Keep dates and timestamps as-is
+            F.col("launch_date"),
+            F.when(F.col("unit_price") > 50000, "PREMIUM")
+             .when(F.col("unit_price") > 10000, "MID_RANGE")
+             .otherwise("BUDGET")
+             .alias("product_segment"),
+            
+            # Keep CDC tracking columns with correct names
+            F.col("__START_AT").alias("start_at"),
+            F.col("__END_AT").alias("end_at"),
+            
+            # Derive is_active from end_at: null means current/active record
+            F.when(F.col("__END_AT").isNull(), F.lit(True)).otherwise(F.lit(False)).alias("is_active"),
+            
+            # Keep updated_at timestamp
+            F.col("updated_at"),
+            
+            # Add processing timestamp for audit trail
+            F.current_timestamp().alias("processed_at")
+          )
+       )
+
         
 <aside>
 🔥
