@@ -576,11 +576,7 @@ Nous utiliserons la modélisation dimensionnelle pour transformer les tables « 
             
     - [ ]  **Step 4/6: Create SQL Views for dim tables**
   
-       - [ ]  Create ***02_Gold_Views.sql***
-       - [ ]  
-          
-       - [ ]  Write the DataFrame to a new Gold table using a clear naming prefix such as `dim_` for dimension tables or `fact_` for fact tables.
-             
+       - [ ]  Create ***02_Gold_Views.sql*** for ***dim_customer, dim_product & fact_inventory***   
              
    - [ ]  **Step 5/6: Commit & Push your changes to the GitHub repository**
          
