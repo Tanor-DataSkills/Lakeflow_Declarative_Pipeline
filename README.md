@@ -281,7 +281,7 @@ Nous allons utiliser la composante ***Lakeflow spark declarative pipeline*** pou
         - [ ]   Attribuer un nom au pipeline nommé ***retail_transformation***
         - [ ]   Un folder est créé par defaut nommé transformations qu'on renomme ***bronze_to_silver***
         - [ ]   On va créer dans le folder **bronze_to_silver*** des ***fichiers.py*** devant servir de code pour chacune des tables à transformer.i.e: ***Product_catalog.py,inventory,account.py,opportunity.py,transactions.py***
-- [ ]   **Step 3/5: Write code transformation using genie**
+- [ ]   **Step 3/5: Transformation using genie**
     - [ ]  ***Data Quality check using @dp.expect_all_or_drop & @dp.expect***
              
       -  ***@dp.expect_all_or_drop("valid_column", "rules")*** est pour appliquer des règles data quality sur les colonnes et supprimer les lignes ne respectant pas les conditions i.e: @dp.expect_all_or_drop("valid_price", "unit_price > 0")
@@ -310,32 +310,42 @@ Nous allons utiliser la composante ***Lakeflow spark declarative pipeline*** pou
         - [ ]  Validate numeric values
         - [ ]  Standardize business key IDs to ensure tables can be joined correctly.
         - [ ]  Check the name of columns and table and make a plan how to rename them to something friendly.
+              
     - [ ]  ***Section 1: Read data Bronze Table and Load it into a DataFrame***
-                - Create df function nommée ***def table_clean()***
-                - Create source_df qui lit la table avec source_df = spark.readStream.table("catalog.schema_bronze.table")
-                - Create selected_df qui lit la table avec selected_df = source_df.select()
-                - Appliquer le ***Return au selected_df pour récupérer le source_df avec des champs qu'on choisi***
->
+        - [ ]  Create df function nommée ***def table_clean()***
+        - [ ]  Create source_df qui lit la table avec ***source_df** = spark.readStream.table("catalog.schema_bronze.table")
+        
+
+        >
              def account_clean():
                    # Read source streaming table
                    source_df = spark.readStream.table("retail_q.salesforce_bronze.account")
     
-                  # Select core business columns with lowercase underscore naming
+       >
+   
+  - [ ]  ***Section 2: Standardize operations - Transform data***
+        
+    - Fix issues one by one
+    - Garder les transformations petites et claires
+    - Eviter une large bloque de transformation
+    - Use Spark SQL or PySpark (Python)
+    - Usage des def function est très pratique:
+    - Appliquer le ***Return au selected_df ou directement au source_df.select()*** pour récupérer les colonnes pertinentes avec des noms en minuscules
+         
+         >
+               def account_clean():
+                   # Read source streaming table
+                   source_df = spark.readStream.table("retail_q.salesforce_bronze.account")
+    
+                  # Sélectionner les colonnes pertinentes avec des noms en minuscules.
                     return source_df.select(
                     F.col("Id").alias("id"),
                     F.col("IsDeleted").alias("is_deleted"),
                     F.upper(F.trim(F.col("Name"))).alias("customer_name"),
                     F.col("Type").alias("type")
                   )
->
-  - [ ]  ***Section 2: Standardize operations - Transform data***
-               - Fix issues one by one
-               - Garder les transformations petites et claires
-               - Eviter une large bloque de transformation
-               - Use Spark SQL or PySpark (Python)
-               - Usage des def function est très pratique:
-         <img width="875" height="338" alt="image" src="https://github.com/user-attachments/assets/faf138d8-c857-4c26-b076-ffc323713479" />
-               - Avant d'aller sur les transformation suivantes il faut toujours checker le résultat avec “df.display()”
+        >
+    - Avant d'aller sur les transformation suivantes il faut toujours checker le résultat avec “df.display()”
       - [ ]  Effectue des vérifications de cohérence sur le DataFrame final avant l'écriture.
          
   - [ ]  ***Section 3: Write the DataFrame to a new Silver Table and use a friendly name for the new table***
