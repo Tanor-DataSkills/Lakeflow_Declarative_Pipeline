@@ -295,18 +295,9 @@ Nous allons utiliser la composante ***Lakeflow spark declarative pipeline*** pou
         - [ ]  Check the name of columns and table and make a plan how to rename them to something friendly.
     - [ ]  ***Section 1: Read data Bronze Table and Load it into a DataFrame***
 
- >  genie output ( cf 01_blob_to_bronze.py file)
+ <img width="875" height="338" alt="image" src="https://github.com/user-attachments/assets/faf138d8-c857-4c26-b076-ffc323713479" />
 
-            ***def account_clean():***
-          #Read source streaming table
-          source_df = spark.readStream.table("retail_q.salesforce_bronze.account")
-         #Select core business columns with lowercase underscore naming
-         return source_df.select(
-         F.col("Id").alias("id"),
-         F.col("IsDeleted").alias("is_deleted")
-         )
-
-    - [ ]  ***Section 2: Standardize operations - Transform data***
+  - [ ]  ***Section 2: Standardize operations - Transform data***
                - Fix issues one by one
                - Garder les transformations petites et claires
                - Eviter une large bloque de transformation
