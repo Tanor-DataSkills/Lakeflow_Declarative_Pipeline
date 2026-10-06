@@ -133,13 +133,19 @@ Nous utiliserons les connecteurs managés de lakeflow connect pour créer 2 pipe
     - [ ]  Launch Databricks workspace
     - [ ]  Create catalog ***retail_q*** et schémas ***postgres_bronze*** for source coming from postgresSQL
     - [ ]  Go to Jobs & Pipelines -> Ingestion pipeline(correspondant au *Lakeflow connect* dans le repos)
+          
     - [ ]  **Step 1/5 : Connexion**
+          
         - [ ]  Parmi toutes les sources disponible on clique sur postgreSQL
         - [ ]  Create connexion between Postgres & Databricks(*connex_name = neon_postgres_project*), pour avoir user, passeword et le port on utilise chat gpt en collant le lien qu'on avait récupéré(*based on this url give me the username, passeword and hostname*)
+              
     - [ ]  **Step 2/5 : Ingestion setup**
+          
         - [ ]  Donner un nom au pipeline(***postgres_to_bronze*** et sélectionne le catalog et schema cibles(créons les respectivement ***retail_q*** et ***postgres_bronze***)
         - [ ]  Cliquez sur *create pipeline and continu*
+              
     - [ ]  **Step 3/5 : Validating pipeline configuration**
+          
         - [ ]  Spécifier la database, le schema et les 2 tables source à ingérer
         - [ ]  Choisir ***batch ou incrementielle ingestion:***
         - [ ]  Choisir dans ***cursor column*** la colonne ***updated_at*** pour définir la colonne ***incrémentielle*** de la table ***product_catalog***
@@ -155,8 +161,11 @@ Nous utiliserons les connecteurs managés de lakeflow connect pour créer 2 pipe
 > **SCD 1:** *Il n'ya pas d'historisation les enregistrements modifiées ou supprimées disparaissent directement; seules les lignes activent seront présente: c'est le cas pour la table inventory.Une ligne sera updatée par le pipeline*.
 
   - [ ]  **Step 4/5 : Spécifier ou stocker les données ingérées dans Databricks**
+        
      - [ ]  Choisir le catalog ***retail_q*** et le schémas ***postgres_bronze***
+           
   - [ ]  **Step 5/5 : Schedules(run planification) & Notifications**
+        
     - [ ]  Add a trigger to run the job on a schedule (for example daily)
     - [ ]  Pour l'instant nous supprimons le schedule de défaut qu'on configurera plus tard en fonction des besoins d'execution
     - [ ]  Les notifications ne sont configurées qu'avec **failure** afin de ce recevoir un email en cas d'echec de pipeline execution.
@@ -165,21 +174,31 @@ Nous utiliserons les connecteurs managés de lakeflow connect pour créer 2 pipe
 - [ ]  **Data Ingestion pipeline from Salesforce with Lakeflow connect(phase 2)**
     - [ ]  Create schémas ***salesforce_bronze*** for source coming from salesforce
     - [ ]  Go to Jobs & Pipelines -> Ingestion pipeline(correspondant au *Lakeflow connect* dans le repos)
+          
     - [ ]  **Step 1/5 : Connexion**
+          
         - [ ]  Parmi toutes les sources disponible on clique sur Salesforce
         - [ ]  Create connexion between Salesforce & Databricks(*connex_name = Salesforce_retail_project*),
         - [ ]  On utilise les username, passeword obtenus lors de la création du salesforce account
+              
     - [ ]  **Step 2/5 : Ingestion setup**
+          
         - [ ]  Donner un nom au pipeline (***salesforce_to_bronze***) et on sélectionne le catalog ***retail_q*** et on crée le schéma cibles ***salesforce_bronze***
-        - [ ]  Cliquez sur *create pipeline and continu*
+        - [ ]  Cliquez sur *create pipeline and continu
+              
     - [ ]  **Step 3/5 : Validating pipeline configuration**
+          
         - [ ]  Spécifier la database, le schema et les 2 tables source à ingérer
         - [ ]  Cocher ***history tracking*** en **ON ou OFF**définit le choix entre  ***batch et incrementielle ingestion***
         - [ ]  Pas besoin de préciser un ***cursor column*** sur Salesforce car c'est déja intégré la colonne pour définir la colonne ***incrémentielle*** de la table ***account***
         - [ ]  Pour la table ***opportunity*** mettre ***history tracking*** en **OFF**.
+              
    - [ ]  **Step 4/5 : Spécifier où stocker les données ingérées dans Databricks**
+         
         - [ ]  Choisir le catalog ***retail_q*** et le schémas ***sales_bronze***
+              
    - [ ]  **Step 5/5 : Schedules(run planification) & Notifications**
+         
         - [ ]  Add a trigger to run the job on a schedule (for example daily)
         - [ ]  Pour l'instant nous supprimons le schedule de défaut qu'on configurera plus tard en fonction des besoins d'execution
         - [ ]  Les notifications ne sont configurées qu'avec **failure** afin de ce recevoir un email en cas d'echec de pipeline execution.
@@ -187,18 +206,23 @@ Nous utiliserons les connecteurs managés de lakeflow connect pour créer 2 pipe
 
 - [ ]  **Data Ingestion pipeline from Volume with Autoloader(phase 3)**
     - [ ]  Create a folder in the repository called ***01_Notebook*** to store all scripts inside it
+          
     - [ ]  **Step 1/3 : Create a folder & notebooks**
+          
         - [ ]  Go to Databricks workspace -> Create new folder nommé ***retail_q*** dans le workspace où l'on stokera tout ce qui est important(notebooks,...)
         - [ ]  Create notebook nommé ***blob_to_bronze***
               
     - [ ]  **Step 2/3 : Read & Write with Autoloader (code genie)**
+          
         - [ ]   Read the ***05_blob_transactions_history.csv*** file se trouvant dans le volume ***transactions_source** into a DataFrame
         - [ ]   Write the DataFrame to a table in the Bronze schema ***blob_bronze*** using overwrite mode.
         - [ ]  Il est conseillé d'utiliser Genie code pour gagner du temps(Genie dispose 2 variants: **Agent**(run multi step data and AI tasks- ***changer le code du notebook***) & **Chat**(Asking question about your code).Pensez à bien vérifier le resultat de genie 
         - [ ]  Choisir Agent et saisir les questions(ce qu'on souhaite faire) dans le prompt.
         - [ ]  Run the script and query the bronze table to verify it is loaded correctly
         - [ ]  Run the whole notebook to see if everything works successfully.
+              
    - [ ]  **Step 3/3 : Push & commit github**
+         
         - [ ]  Commit & Push your changes to the GitHub repository
 
 > [!IMPORTANT]
@@ -272,9 +296,12 @@ Nous allons utiliser la composante ***Lakeflow spark declarative pipeline*** pou
 
 - [ ]  **ETL pipeline for cleaning & transforming using Lakeflow spark declarative pipeline**
     - [ ]  **Step 1/5: Github setup**
+          
         - [ ]  Create repository structure
         - [ ]  Create a folder called ***00_Bronze_to_silver*** pour y stocker les notebooks de lakeflow spark declarative pipeline pour chaque table.
+              
     - [ ]  **Step 2/5: Etl pipeline setup**
+          
         - [ ]  For each Bronze table (4 tables)
             - [ ]   Create dans le catalog ***retail_q*** le schémas ***retail_silver*** pour les tables transformées venant de toutes les bronze layers
             - [ ]   Go to Jobs & Pipelines -> Etl pipeline -> configure the blank pipeline :
@@ -282,6 +309,7 @@ Nous allons utiliser la composante ***Lakeflow spark declarative pipeline*** pou
             - [ ]   Un folder est créé par defaut nommé transformations qu'on renomme ***bronze_to_silver***
             - [ ]   On va créer dans le folder **bronze_to_silver*** des ***fichiers.py*** devant servir de code pour chacune des tables à transformer.i.e: ***Product_catalog.py,inventory,account.py,opportunity.py,transactions.py***
     - [ ]   **Step 3/5: Transformation using genie**
+          
         - [ ]  ***Data Quality check using @dp.expect_all_or_drop & @dp.expect***
              
       -  ***@dp.expect_all_or_drop("valid_column", "rules")*** est pour appliquer des règles data quality sur les colonnes et supprimer les lignes ne respectant pas les conditions i.e: @dp.expect_all_or_drop("valid_price", "unit_price > 0")
@@ -312,7 +340,8 @@ Nous allons utiliser la composante ***Lakeflow spark declarative pipeline*** pou
           - [ ]  Standardize business key IDs to ensure tables can be joined correctly.
           - [ ]  Check the name of columns and table and make a plan how to rename them to something friendly.
               
-    - [ ]  ***Section 1: Read data Bronze Table and Load it into a DataFrame***
+    - [ ]  **Section 1: Read data Bronze Table and Load it into a DataFrame**
+          
          - [ ]  Create df function nommée ***def table_clean()***
          - [ ]  Create source_df qui lit la table avec ***source_df** = spark.readStream.table("catalog.schema_bronze.table")
         
@@ -324,7 +353,7 @@ Nous allons utiliser la composante ***Lakeflow spark declarative pipeline*** pou
     
        >
    
-    - [ ]  ***Section 2: Standardize operations - Transform data***
+    - [ ]  **Section 2: Standardize operations - Transform data**
           
 - Fix issues one by one
 - Garder les transformations petites et claires
@@ -347,10 +376,9 @@ Nous allons utiliser la composante ***Lakeflow spark declarative pipeline*** pou
                   )
         >
         
-      - Avant d'aller sur les transformation suivantes il faut toujours checker le résultat avec “df.display()”
-       - [ ]  Effectue des vérifications de cohérence sur le DataFrame final avant l'écriture.
+    - [ ]  Effectue des vérifications de cohérence sur le DataFrame final avant l'écriture.
          
-    - [ ]  ***Step 4/5: Run the pipeline***
+    - [ ]  **Step 4/5: Run the pipeline**
   
        - [ ]  Finalize notebook
           - [ ]  Review structure and readability
@@ -360,7 +388,7 @@ Nous allons utiliser la composante ***Lakeflow spark declarative pipeline*** pou
           - [ ]  Vérification de cohérence de la table « silver » après écriture
           - [ ]  Notre pipeline ***retail_transformation*** et le fichier ***product_catalog.py*** sont créés
        
-  - [ ]  ***Step 5/5:Commit & Push your changes to the GitHub repository***
+  - [ ]  **Step 5/5:Commit & Push your changes to the GitHub repository**
       - [ ]  Clone the notebook as a template for the next table
 
 > [!IMPORTANT]
@@ -457,64 +485,109 @@ Nous allons utiliser la composante ***Lakeflow spark declarative pipeline*** pou
 
 **Goal**: Dissocier le modèle de données des systèmes sources et mettre en place un nouveau modèle adapté à la Business Intelligence et à l'analyse de données.
 
-          Nous utiliserons la modélisation dimensionnelle pour transformer les tables « Silver » ***inventory, account, opportunity,transactions*** en un schéma en étoile composé de tables de ***fact*** et de tables de ***dimensions***.
+Nous utiliserons la modélisation dimensionnelle pour transformer les tables « Silver » ***inventory, account, opportunity,transactions*** en un schéma en étoile composé de tables de ***fact*** et de tables de ***dimensions***.
           <img width="692" height="524" alt="image" src="https://github.com/user-attachments/assets/a704457f-6a67-4467-b0cb-3c7a1de84e56" />
-- On va joindre les tables Transactions et opportunity pour avoir la ***fact table***
-- Pour les tables de dimensions on aura ***dim_customer, dim_product et dim_calendar***. La table inventory ne fera pas parti du modèle.
+- On va joindre les tables Transactions et opportunity pour avoir la ***fact table***.
+- Pour les tables de dimensions en pratique on les transforme directement en vues via SQL mais pour notre cas comme elles deja propres on les laisse dans le silver en tant que tables ***dim_customer, dim_product, dim_calendar****.
   
 </aside>
  
-- [ ]  ***Data Modeling using Lakeflow spark declarative pipeline***
-    - [ ]  ***Step 1/4 : Data model preparation***
+- [ ]  **Data Modeling using Lakeflow spark declarative pipeline & SQL Views**
+    - [ ]   **Step 1/6 : Data model preparation**
           
         - [ ]  Comprendre le contenu de chaque Silver table
         - [ ]  Map each table to a business object such as customers, products, or sales
         - [ ]  Utiliser draw.io pour dessiner le data model cible. Example: `fact_sales`, `dim_customers`, `dim_products`, `dim_calendar
               
-    - [ ]  ***Step 2/4: Github setup**
+    - [ ]  ***Step 2/6: Github setup***
           
         - [ ]  Create repository structure
-        - [ ]  Create a folder called ***0_Silver_to_gold*** pour y stocker les notebooks de lakeflow spark declarative pipeline pour chaque table.
+        - [ ]  Create a folders called ***01_Silver_to_gold & 01_Notebook*** pour y stocker les notebooks de lakeflow spark declarative pipeline pour chaque table.
               
-   - [ ]  ***Step 3/4: Build Gold tables - For each table in the new model:***
+   - [ ]   **Step 3/6: Build Gold tables - For each table in the new model**
          
        - [ ]  For each Bronze table (4 tables)
            - [ ]  Go to Jobs & Pipelines -> Etl pipeline ->***retail_transformation -> edit pipeline*** :
            - [ ]  Créer un nouveau folder nommé ***Silver_to_gold***
            - [ ]  On va créer dans le folder **silver_to_gold*** des ***fichiers.py*** devant servir de code pour chacune des tables de dimension et de fact.i.e: ***dim_product.py,dim_product.py,fact_sales.py***
-           - [ ]  Usage des def function est très pratique:
-           - [ ]  Créer 2 dataframes: transaction_df & opportunity_df 
+                 
+      - [ ]  **Section 1: Join preparation**
+          
+           - [ ]  Create def function nommée ***def fact_sales()***
+           - [ ]  Créer 2 dataframes: transaction_df & opportunity_df qui lisent les tables delta dans silver:
+               - [ ]    ***transactions_df*** = spark.read.table("retail_q.retail_silver.transactions")
+               - [ ]    ***opportunity_df*** = spark.read.table("retail_q.retail_silver.opportunity")
+                  
+      - [ ]  **Section 2: Join & select useful columns**
+                 
            - [ ]  Join all relevant Silver tables for the dimension or fact( Transaction & opportunity
            - [ ]  Créer un dataframe ***join_df(issu des 2 premiers)***
            - [ ]  Créer un autre dataframe ***selected_df*** auquel on applique le ***Return*** pour récupérer les colonnes pertinentes avec des noms en minuscules
            - [ ]  S'assurer qu'il n'y ait pas de doublons after joins
          
-         >
-               def account_clean():
-                   # Read source streaming table
-                   source_df = spark.readStream.table("retail_q.salesforce_bronze.account")
-    
-                  # Sélectionner les colonnes pertinentes avec des noms en minuscules.
-                    return source_df.select(
-                    F.col("Id").alias("id"),
-                    F.col("IsDeleted").alias("is_deleted"),
-                    F.upper(F.trim(F.col("Name"))).alias("customer_name"),
-                    F.col("Type").alias("type")
-                  )
         >
-        
-         
-      - Avant d'aller sur les transformation suivantes il faut toujours checker le résultat avec “df.display()”
-       - [ ]  Effectue des vérifications de cohérence sur le DataFrame final avant l'écriture.
-         
-      
-           - [ ]  Validate the query output
-       - [ ]  Load the result into a DataFrame
-       - [ ]  Write the DataFrame to a new Gold table using a clear naming prefix such as `dim_` for dimension tables or `fact_` for fact tables.
-       - [ ]  Sanity checks of gold table after writing
-             
-   - [ ]  ***Step 4/4:Commit & Push your changes to the GitHub repository***
+              from pyspark.sql.functions import upper, trim, sum as _sum, countDistinct, col
+              from pyspark import pipelines as dp
 
+             @dp.table(name="retail_q.retail_gold.fact_sales")
+             def fact_sales():
+             transactions_df = spark.read.table("retail_q.retail_silver.transactions")
+             opportunity_df = spark.read.table("retail_q.retail_silver.opportunity")
+    
+             joined_df = transactions_df.alias("t").join(
+             opportunity_df.alias("o"),
+             upper(trim(transactions_df.opportunity_name)) == upper(trim(opportunity_df.name)),
+             how="left"
+            )
+       
+            # Select important columns (customize as needed)
+            selected_df = joined_df.select(
+           "t.transaction_id",
+           "t.opportunity_name",
+           "t.product_id",
+           "t.store_id",
+           "t.quantity",
+           "t.selling_price",
+           "t.discount_amount",
+           "t.transaction_timestamp",
+           col("t.transaction_timestamp").cast("date").alias("transaction_date"),
+           "t.payment_mode",
+           "t.sales_channel",
+           "o.name",
+           "o.stage_name",
+           "o.owner_id",
+           "o.amount",
+            col("o.account_id").alias("customer_id")
+          )
+         return selected_df
+     >
+         
+- [ ]  Effectue des vérifications de cohérence sur le DataFrame final avant l'écriture.
+         
+    - [ ]  **Step 4/6: Run the pipeline**
+  
+       - [ ]  Finalize notebook
+          - [ ]  Review structure and readability
+          - [ ]  Add comments and documentation
+          - [ ]  Run the full notebook end to end
+          - [ ]  Choisi le catalog et schema de destination (***retail_q et retail_gold***)
+          - [ ]  Vérification de cohérence de la table **fact_sales** dans unity catalog
+          - [ ]  On peut créer des vues ou les laisser en silver pour les dimensions
+            
+    - [ ]  **Step 4/6: Create SQL Views for dim tables**
+  
+       - [ ]  Create ***02_Gold_Views.sql***
+       - [ ]  
+          
+       - [ ]  Write the DataFrame to a new Gold table using a clear naming prefix such as `dim_` for dimension tables or `fact_` for fact tables.
+             
+             
+   - [ ]  **Step 5/6: Commit & Push your changes to the GitHub repository**
+         
+- [ ]  **Create dim_calendar with notebook**
+
+      
+- [ ]  **Create metric Views.py**
 <aside>
 🔥
 
