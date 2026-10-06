@@ -177,13 +177,13 @@ Nous utiliserons les connecteurs managés de lakeflow connect pour créer 2 pipe
         - [ ]  Cocher ***history tracking*** en **ON ou OFF**définit le choix entre  ***batch et incrementielle ingestion***
         - [ ]  Pas besoin de préciser un ***cursor column*** sur Salesforce car c'est déja intégré la colonne pour définir la colonne ***incrémentielle*** de la table ***account***
         - [ ]  Pour la table ***opportunity*** mettre ***history tracking*** en **OFF**.
-  - [ ]  **Step 4/5 : Spécifier où stocker les données ingérées dans Databricks**
-     - [ ]  Choisir le catalog ***retail_q*** et le schémas ***sales_bronze***
-  - [ ]  **Step 5/5 : Schedules(run planification) & Notifications**
-    - [ ]  Add a trigger to run the job on a schedule (for example daily)
-    - [ ]  Pour l'instant nous supprimons le schedule de défaut qu'on configurera plus tard en fonction des besoins d'execution
-    - [ ]  Les notifications ne sont configurées qu'avec **failure** afin de ce recevoir un email en cas d'echec de pipeline execution.
-    - [ ]  On clique sur **Save & Run** pour terminer la création du **ingestion pipeline** nommé ***salesforce_to_bronze*** qui ingère dans le catalogue ***retail_q*** et le schema ***salesforce_bronze*** de Unity catalog de databricks les tables ***account** et ***opportunity***.
+   - [ ]  **Step 4/5 : Spécifier où stocker les données ingérées dans Databricks**
+        - [ ]  Choisir le catalog ***retail_q*** et le schémas ***sales_bronze***
+   - [ ]  **Step 5/5 : Schedules(run planification) & Notifications**
+        - [ ]  Add a trigger to run the job on a schedule (for example daily)
+        - [ ]  Pour l'instant nous supprimons le schedule de défaut qu'on configurera plus tard en fonction des besoins d'execution
+        - [ ]  Les notifications ne sont configurées qu'avec **failure** afin de ce recevoir un email en cas d'echec de pipeline execution.
+        - [ ]  On clique sur **Save & Run** pour terminer la création du **ingestion pipeline** nommé ***salesforce_to_bronze*** qui ingère dans le catalogue ***retail_q*** et le schema ***salesforce_bronze*** de Unity catalog de databricks les tables ***account** et ***opportunity***.
 
 - [ ]  **Data Ingestion pipeline from Volume with Autoloader(phase 3)**
     - [ ]  Create a folder in the repository called ***01_Notebook*** to store all scripts inside it
@@ -271,18 +271,18 @@ Nous allons utiliser la composante ***Lakeflow spark declarative pipeline*** pou
 </aside>
 
 - [ ]  **ETL pipeline for cleaning & transforming using Lakeflow spark declarative pipeline (phase 3)**
-- [ ]  **Step 1/5: Github setup**
-    - [ ]  Create repository structure
-    - [ ]  Create a folder called ***00_Bronze_to_silver*** pour y stocker les notebooks de lakeflow spark declarative pipeline pour chaque table.
-- [ ]  **Step 2/5: Etl pipeline setup**
-    - [ ]  For each Bronze table (4 tables)
-        - [ ]   Create dans le catalog ***retail_q*** le schémas ***retail_silver*** pour les tables transformées venant de toutes les bronze layers
-        - [ ]   Go to Jobs & Pipelines -> Etl pipeline -> configure the blank pipeline :
-        - [ ]   Attribuer un nom au pipeline nommé ***retail_transformation***
-        - [ ]   Un folder est créé par defaut nommé transformations qu'on renomme ***bronze_to_silver***
-        - [ ]   On va créer dans le folder **bronze_to_silver*** des ***fichiers.py*** devant servir de code pour chacune des tables à transformer.i.e: ***Product_catalog.py,inventory,account.py,opportunity.py,transactions.py***
-- [ ]   **Step 3/5: Transformation using genie**
-    - [ ]  ***Data Quality check using @dp.expect_all_or_drop & @dp.expect***
+    - [ ]  **Step 1/5: Github setup**
+        - [ ]  Create repository structure
+        - [ ]  Create a folder called ***00_Bronze_to_silver*** pour y stocker les notebooks de lakeflow spark declarative pipeline pour chaque table.
+    - [ ]  **Step 2/5: Etl pipeline setup**
+        - [ ]  For each Bronze table (4 tables)
+            - [ ]   Create dans le catalog ***retail_q*** le schémas ***retail_silver*** pour les tables transformées venant de toutes les bronze layers
+            - [ ]   Go to Jobs & Pipelines -> Etl pipeline -> configure the blank pipeline :
+            - [ ]   Attribuer un nom au pipeline nommé ***retail_transformation***
+            - [ ]   Un folder est créé par defaut nommé transformations qu'on renomme ***bronze_to_silver***
+            - [ ]   On va créer dans le folder **bronze_to_silver*** des ***fichiers.py*** devant servir de code pour chacune des tables à transformer.i.e: ***Product_catalog.py,inventory,account.py,opportunity.py,transactions.py***
+    - [ ]   **Step 3/5: Transformation using genie**
+        - [ ]  ***Data Quality check using @dp.expect_all_or_drop & @dp.expect***
              
       -  ***@dp.expect_all_or_drop("valid_column", "rules")*** est pour appliquer des règles data quality sur les colonnes et supprimer les lignes ne respectant pas les conditions i.e: @dp.expect_all_or_drop("valid_price", "unit_price > 0")
         
@@ -304,16 +304,17 @@ Nous allons utiliser la composante ***Lakeflow spark declarative pipeline*** pou
                @dp.expect_or_drop("valid_launch_date", "launch_date IS NOT NULL")
                @dp.expect("valid_supplier", "supplier_name IS NOT NULL")
           >
-        - [ ]  Find duplicates
-        - [ ]  Validate string values: Check extra spaces, Identify abbreviations to normalize
-        - [ ]  Validate dates values: Check Data Type, check the format, handle missing values
-        - [ ]  Validate numeric values
-        - [ ]  Standardize business key IDs to ensure tables can be joined correctly.
-        - [ ]  Check the name of columns and table and make a plan how to rename them to something friendly.
+          
+          - [ ]  Find duplicates
+          - [ ]  Validate string values: Check extra spaces, Identify abbreviations to normalize
+          - [ ]  Validate dates values: Check Data Type, check the format, handle missing values
+          - [ ]  Validate numeric values
+          - [ ]  Standardize business key IDs to ensure tables can be joined correctly.
+          - [ ]  Check the name of columns and table and make a plan how to rename them to something friendly.
               
     - [ ]  ***Section 1: Read data Bronze Table and Load it into a DataFrame***
-        - [ ]  Create df function nommée ***def table_clean()***
-        - [ ]  Create source_df qui lit la table avec ***source_df** = spark.readStream.table("catalog.schema_bronze.table")
+         - [ ]  Create df function nommée ***def table_clean()***
+         - [ ]  Create source_df qui lit la table avec ***source_df** = spark.readStream.table("catalog.schema_bronze.table")
         
 
         >
@@ -323,14 +324,14 @@ Nous allons utiliser la composante ***Lakeflow spark declarative pipeline*** pou
     
        >
    
-  - [ ]  ***Section 2: Standardize operations - Transform data***
-        
-    - Fix issues one by one
-    - Garder les transformations petites et claires
-    - Eviter une large bloque de transformation
-    - Use Spark SQL or PySpark (Python)
-    - Usage des def function est très pratique:
-    - Appliquer le ***Return au selected_df ou directement au source_df.select()*** pour récupérer les colonnes pertinentes avec des noms en minuscules
+    - [ ]  ***Section 2: Standardize operations - Transform data***
+          
+- Fix issues one by one
+- Garder les transformations petites et claires
+- Eviter une large bloque de transformation
+- Use Spark SQL or PySpark (Python)
+- Usage des def function est très pratique:
+- Appliquer le ***Return au selected_df ou directement au source_df.select()*** pour récupérer les colonnes pertinentes avec des noms en minuscules
          
          >
                def account_clean():
@@ -345,18 +346,22 @@ Nous allons utiliser la composante ***Lakeflow spark declarative pipeline*** pou
                     F.col("Type").alias("type")
                   )
         >
-    - Avant d'aller sur les transformation suivantes il faut toujours checker le résultat avec “df.display()”
-      - [ ]  Effectue des vérifications de cohérence sur le DataFrame final avant l'écriture.
+        
+      - Avant d'aller sur les transformation suivantes il faut toujours checker le résultat avec “df.display()”
+       - [ ]  Effectue des vérifications de cohérence sur le DataFrame final avant l'écriture.
          
-  - [ ]  ***Section 3: Write the DataFrame to a new Silver Table and use a friendly name for the new table***
-       - [ ]  Sanity checks of silver table after writing
+    - [ ]  ***Step 4/5: Run the pipeline***
+  
        - [ ]  Finalize notebook
-          - [ ]  Run the full notebook end to end
           - [ ]  Review structure and readability
           - [ ]  Add comments and documentation
-          - [ ]  Clone the notebook as a template for the next table
-  - [ ]  ***Commit & Push your changes to the GitHub repository***
-
+          - [ ]  Run the full notebook end to end
+          - [ ]  Choisi le catalog et schema de destination (***retail_q et retail_silver***)
+          - [ ]  Vérification de cohérence de la table « silver » après écriture
+          - [ ]  Notre pipeline ***retail_transformation*** et le fichier ***product_catalog.py*** sont créés
+       
+  - [ ]  ***Step 5/5:Commit & Push your changes to the GitHub repository***
+      - [ ]  Clone the notebook as a template for the next table
 
 > [!IMPORTANT]
 > **Goal of the question in genie:** Create silver layer table in spark lakeflow declarative pipeline
@@ -432,24 +437,18 @@ Nous allons utiliser la composante ***Lakeflow spark declarative pipeline*** pou
           )
        )
 
-        
-<aside>
-🔥
+> [!IMPORTANT]
+> Pour le traitement des autres tables ***inventory, account, opportunity,transactions*** on revient sur notre pipeline ***retail_transformation*** pour ***l'éditer*** afin de reprendre le même processus pour générer ***inventory.py, account.py, opportunity.py,transactions.py*** dans le meme folder ***bronze_to_silver***. On peut copier le code utlisé ou genie pour product_catalog.py pour les autres fichiers.
 
-**Bonus Advanced Task**
+<img width="996" height="618" alt="image" src="https://github.com/user-attachments/assets/24c6e51d-bd83-4824-8f4a-95974ad71da5" />
 
-- Review all 6 Silver notebooks and identify repeated code
-- Reduce repetition by:
-    - Using a config file with loops, or
-    - Creating reusable Python functions
 
-**Result:** Cleaner, scalable code and a strong step toward senior data engineering.
 
-</aside>
+
 
 <aside>
 
-Result: All Bronze tables are transformed into analytics-ready Silver tables with validated data quality and standardized structure.
+**Result:** All Bronze tables are transformed into analytics-ready Silver tables with validated data quality and standardized structure using Lakeflow spark declarative pipeline.
 
 </aside>
 
@@ -459,10 +458,10 @@ Result: All Bronze tables are transformed into analytics-ready Silver tables wit
 
 <aside>
 
-**Goal**: 
+**Goal**: Dissocier le modèle de données des systèmes sources et mettre en place un nouveau modèle adapté à la Business Intelligence et à l'analyse de données.
 
-- Break the data model away from the source systems and introduce a new data model that is suitable for business intelligence and analytics.
-- Use dimensional modeling to transform the Silver tables into a star schema with fact and dimension tables.
+          Nous utiliserons la modélisation dimensionnelle pour transformer les tables « Silver » ***inventory, account, opportunity,transactions*** en un schéma en étoile composé de tables de ***fact*** et de tables de ***dimensions***.
+          
 </aside>
 
 - [ ]  Data Modeling Phase
