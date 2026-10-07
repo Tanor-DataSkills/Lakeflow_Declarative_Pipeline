@@ -562,7 +562,7 @@ Nous utiliserons la modélisation dimensionnelle pour transformer les tables « 
          return selected_df
      >
          
-- [ ]  Effectue des vérifications de cohérence sur le DataFrame final avant l'écriture.
+- [ ]  Effectue des vérifications de cohérence sur le DataFrame final avant le run.
          
     - [ ]  **Step 4/6: Run the pipeline**
   
@@ -574,16 +574,17 @@ Nous utiliserons la modélisation dimensionnelle pour transformer les tables « 
           - [ ]  Vérification de cohérence de la table **fact_sales** dans unity catalog
           - [ ]  On peut créer des vues ou les laisser en silver pour les dimensions
             
-    - [ ]  **Step 4/6: Create SQL Views for dim tables**
+    - [ ]  **Step 4/6: Create SQL Views & calendar table for dim tables**
   
-       - [ ]  Create ***02_Gold_Views.sql*** for ***dim_customer, dim_product & fact_inventory***   
-             
-   - [ ]  **Step 5/6: Commit & Push your changes to the GitHub repository**
+       - [ ]  Create views ***dim_customer, dim_product & fact_inventory*** dans ***retail_q.retail_gold*** via le fichier ***02_Gold_Views.sql***
+       - [ ]  Create **dim_calendar** with notebook via le fichier ***03_calendar.py***
+           - [ ]  On peut générer la table calendar via genie avec la syntaxe suivante:
+                 
+                 - "I want to create a calendar table in retail_q.retail_gold schema.It should have a date column which will be key column.Add other columns based on date like year, month, week which are standard columns used in generic calendar tables.Provide start and end date so that i can decide how mach data to be populated"
          
-- [ ]  **Create dim_calendar with notebook**
+   - [ ]  **Step 6/6: Commit & Push your changes to the GitHub repository**
+         
 
-      
-- [ ]  **Create metric Views.py**
 <aside>
 🔥
 
@@ -608,6 +609,58 @@ You are now responsible for making it reliable, clear, and easy to use
 <aside>
 
 **Result**: All Silver tables are transformed into business-ready Gold tables designed for analytics and reporting.
+
+</aside>
+
+---
+> [!NOTE]
+> # Phase5 - Building the Semantic layer using the Metric view 
+
+<aside>
+
+**Goal:** Databricks a récemment créé une nouvelle fonctionalité appelée ***Metric View*** qui fait à peu prés la même chose que les cubes tabulaires de SSAS facilitant une analyse multidimensionnelle associant dimensions et measures
+
+
+
+- [ ]  **Implementing Metric Views**
+    - [ ]   **Step 1/4 : Define Metric View using YAML & SQL(generate code by genie)**
+          
+        - [ ]  Create un schema nommé **retail_semantic**
+        - [ ]  Nous pouvons créer sous ce schema un **Metric View** mais nous passerons par genie
+              
+> [!NOTE]
+> **Rappel sur les objets de Unity catalog :**
+> 
+> L'architecture de stockage de Unity catalog est hiérarchisé comme suit: ***Metadata -> Catalog -> Schemas ->(Table,Views, Volume & Metric View)***
+
+
+> [!IMPORTANT]
+> **Goal of the question in genie:** Create a Metric View sans passer par SQL et YAML
+> 
+> **Question 3:** 
+> 
+>  **Answer 3:**
+              
+   - [ ]  ***Step 2/4: Github setup***
+          
+        - [ ]  Create repository structure
+        - [ ]  Le folder 01_Notebook existe déja
+              
+   - [ ]  ***Step 3/4: Modeling the Metric View***
+          
+        - [ ]  Spécifier les axes d'analyses(dimensions) et measures
+        - [ ]  
+              
+   - [ ]  ***Step 4/4: Use Metric View(Query it)***
+          
+        - [ ]  Use multiple language Sql, Python, Scala to query our Metric View
+        - [ ]  Generate AI/BI Dashboards with Metric View
+        - [ ]  Use AI/BI Genie to interacte with Metric View
+        - [ ]  Plan a alert with Metric View
+        - [ ]  Assistant with Metric View
+              
+</aside>
+
 
 </aside>
 
