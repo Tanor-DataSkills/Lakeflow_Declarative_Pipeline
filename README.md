@@ -641,17 +641,17 @@ You are now responsible for making it reliable, clear, and easy to use
 > 
 >  **Answer 3:**
               
-   - [ ]  ***Step 2/4: Github setup***
+   - [ ]  **Step 2/4: Github setup**
           
         - [ ]  Create repository structure
         - [ ]  Le folder 01_Notebook existe déja
               
-   - [ ]  ***Step 3/4: Modeling the Metric View***
+   - [ ]  **Step 3/4: Modeling the Metric View**
           
         - [ ]  Spécifier les axes d'analyses(dimensions) et measures
         - [ ]  
               
-   - [ ]  ***Step 4/4: Use Metric View(Query it)***
+   - [ ]  **Step 4/4: Use Metric View(Query it)**
           
         - [ ]  Use multiple language Sql, Python, Scala to query our Metric View
         - [ ]  Generate AI/BI Dashboards with Metric View
