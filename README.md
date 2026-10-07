@@ -74,7 +74,7 @@ Une modélisation en étoile sera conçue.dans Gold layer on aura une Fact_table
 
 ---
 
-## 🏗️ Phase2 - Project Initialization
+## 🏗️ Phase 2 - Project Initialization
 
 <aside>
 
@@ -121,7 +121,7 @@ Nous utiliserons les connecteurs managés de lakeflow connect pour créer 2 pipe
 
 ---
 > [!NOTE]
-> ## 🥉 Phase2 - Building Bronze Layers(postgres_bronze, salesforce_bronze, blob_bronze)
+> ## 🥉 Phase 3 - Building Bronze Layers(postgres_bronze, salesforce_bronze, blob_bronze)
 
 <aside>
 
@@ -132,11 +132,11 @@ Nous utiliserons les connecteurs managés de lakeflow connect pour créer 2 pipe
 - [ ]   **Data Ingestion pipeline from Postgres with Lakeflow connect(phase 1)**
     - [ ]  Launch Databricks workspace
     - [ ]  Create catalog ***retail_q*** et schémas ***postgres_bronze*** for source coming from postgresSQL
-    - [ ]  Go to Jobs & Pipelines -> Ingestion pipeline(correspondant au *Lakeflow connect* dans le repos)
+    - [ ]  Go to Jobs & Pipelines -> Ingestion pipeline(correspondant au **Lakeflow connect** dans le repos)
           
     - [ ]  **Step 1/5 : Connexion**
           
-        - [ ]  Parmi toutes les sources disponible on clique sur postgreSQL
+        - [ ]  Parmi toutes les sources disponibles on clique sur postgreSQL
         - [ ]  Create connexion between Postgres & Databricks(*connex_name = neon_postgres_project*), pour avoir user, passeword et le port on utilise chat gpt en collant le lien qu'on avait récupéré(*based on this url give me the username, passeword and hostname*)
               
     - [ ]  **Step 2/5 : Ingestion setup**
@@ -177,7 +177,7 @@ Nous utiliserons les connecteurs managés de lakeflow connect pour créer 2 pipe
           
     - [ ]  **Step 1/5 : Connexion**
           
-        - [ ]  Parmi toutes les sources disponible on clique sur Salesforce
+        - [ ]  Parmi toutes les sources disponibles on clique sur Salesforce
         - [ ]  Create connexion between Salesforce & Databricks(*connex_name = Salesforce_retail_project*),
         - [ ]  On utilise les username, passeword obtenus lors de la création du salesforce account
               
@@ -284,7 +284,7 @@ Nous utiliserons les connecteurs managés de lakeflow connect pour créer 2 pipe
 
 ---
 > [!NOTE]
-> ## 🥈 Phase3 - Building Silver Layer (Data Cleaning & Transformation)
+> ## 🥈 Phase 4 - Building Silver Layer (Data Cleaning & Transformation)
 
 <aside>
 
@@ -479,7 +479,7 @@ Nous allons utiliser la composante ***Lakeflow spark declarative pipeline*** pou
 
 ---
 > [!NOTE]
-> ## 🥇 Phase4 - Building Gold Layer
+> ## 🥇 Phase 5 - Building Gold Layer
 
 <aside>
 
@@ -618,7 +618,7 @@ You are now responsible for making it reliable, clear, and easy to use
 
 ---
 > [!NOTE]
-> # Phase5 - Building the Semantic layer using the Metric view 
+> ## 🔥 Phase 6 - Building the Semantic layer using the Metric view 
 
 <aside>
 
@@ -641,9 +641,21 @@ You are now responsible for making it reliable, clear, and easy to use
 > [!IMPORTANT]
 > **Goal of the question in genie:** Create a Metric View sans passer par SQL et YAML
 > 
-> **Question 4:** 
+> **Question 4:** We want to create a metric view with name as ***retail_metrics*** in ***"reatail_q.retail_semantic"*** schema
 > 
->  **Answer 4:**
+> Read the following table schema and sample data:
+> 
+> retail_d.retail_gold.fact_sales
+> 
+> retail_d.retail_gold.dim_product
+> 
+> retail_d.retail_gold.dim_customer
+> 
+> retail_d.retail_gold.dim_calendar
+> 
+> Decide the dimensions and measures based on the data and then create it as a metric view
+> 
+>  **Answer 4:** coller le result de genie dans un notebook metric_view.py et l'executer
               
    - [ ]  **Step 2/4: Github setup**
           
@@ -653,60 +665,89 @@ You are now responsible for making it reliable, clear, and easy to use
    - [ ]  **Step 3/4: Modeling the Metric View**
           
         - [ ]  Spécifier les axes d'analyses(dimensions) et measures
-        - [ ]  
               
-   - [ ]  **Step 4/4: Use Metric View(Query it)**
+              
+   - [ ]  **Step 4/4: Consumption Metric View(Query it)**
           
         - [ ]  Use multiple language Sql, Python, Scala to query our Metric View
         - [ ]  Generate AI/BI Dashboards with Metric View
         - [ ]  Use AI/BI Genie to interacte with Metric View
+             - [ ] Go to Genie spaces -> New space -> All -> retail_gold ->select the gold tables -> create
+             - [ ] On peut maintenant poser des question via natural langage pour obtenir des réponses sur nos données
+             - [ ] i.e: which customer is doing max transactions
         - [ ]  Plan a alert with Metric View
         - [ ]  Assistant with Metric View
-              
+
+> [!IMPORTANT]
+> **Goal of the question in genie:** Consume Metric View using a Dashboard
+> 
+> **Question A:** Create a detailed analysis dashboard based on the metric view ***reatail_q.retail_semantic.retail_metrics***.Understand each on dimensions and measures and prepare the dashboard
+>
+> **Question A:** Update this dashboard based on the metric view ***reatail_q.retail_semantic.retail_metrics***
+>
+> **Question A:** All visualizations are empty; no fields are selected
+> 
+>  **Answers :** Une nouvelle page s'ouvre pour éditer le dashboard qu'on peut exporter, partager et publier dans Dashboards pour l'accès aux end users
+
+**Result**: Nous disposons d'un outil complet d'analyse de données avec plusieurs possibilités d'utilisation (Dashboards, genie, SQL) and reporting.
+
 </aside>
+              
 
 
 </aside>
 
 ---
 > [!NOTE]
-> # Phase5 - Building the Pipeline
+> ## Phase 7 - Building the Pipeline
 
 <aside>
 
-Goal: Automate the end-to-end Lakehouse flow so data is processed reliably from Bronze to Silver to Gold.
+**Goal:** Automatiser le flux de lakehouse du debut à la fin de telle sorte que les données sont traitées de manière fiable de Bronze à Gold en passant par silver.
 
 </aside>
 
-### Current Setup
+### Current Setup (Configuration actuelle)
 
-- 1 Bronze notebook
-- 6 Silver transformation notebooks
-- 3 Gold notebooks (dimensions and facts)
+- 2 Ingestion pipelines  (Lakeflow connect): postgres_to_bronze & salesforce_to_bronze
+- 1 notebook : blob_to_bronze (01_blob_to_bronze.py)
+- 1 ETL pipeline nommé **retail_transaction** contenant 2 folders: bronze_to_silver et silver_to_gold
+    - Dans ***bronze_to_silver*** il y'a les notebooks ***Product_catalog.py, inventory, account.py, opportunity.py, transactions.py***
+    - Dans ***silver_to_gold*** on a les notebooks ***dim_product.py, dim_product.py, fact_sales.py***. Par simplicité on a juste créé le ***fact_sales.py***.
+- 1 notebook pour la table dim_calendar (03_calendar.py)
+- 1 notebook pour les Views (02_Gold_Views.sql)
+- 1 notebook pour Metric View (04_Metric View.py)
+
 
 To run each layer cleanly, we introduce **orchestration notebooks** that act as single entry points.
 
 ---
 
-- [ ]  **Create Orchestration Notebooks**
+- [ ]  **Step 1/4: Create Orchestration Notebooks**
+      
     - [ ]  Silver orchestration: Create one Silver orchestration notebook that triggers all 6 Silver notebooks in sequence. Use **`dbutils.notebook.run`** to run notebookes.
     - [ ]  Silver orchestration: Create one Gold orchestration notebook that triggers all 6 Silver notebooks in sequence. Use **`dbutils.notebook.run`** to run notebookes.
-- [ ]  C**reate a Databricks Job**
+          
+- [ ]  **Step 2/4: Create a Databricks Job**
+      
     - [ ]  Go to **Databricks → Jobs & Pipelines** then create Create a new Job
-    - [ ]  Create a new Job and Give it a clear name, for example: `loading_bike_data_lakehouse`
-    - [ ]  Add three Tasks:
-        
-        !image.png
+    - [ ]  Create a new Job and Give it a clear name, for example: ***RetaiQ_end_to_end_job***
+    - [ ]  Add Tasks:
+        On aura affaire à des pipelines tasks et notebook tasks selon le cas:
         
         - [ ]  Bronze layer: bronze notebook
         - [ ]  Silver layer: silver_orchestration that triggers all other silver notebookes
         - [ ]  Gold layer: gold_orchestration that triggers all other gold notebookes
-- [ ]  **Run and Validate**
+              
+- [ ]  **Step 3/4: Run and Validate**
+      
     - [ ]  Click **Run All,**
     - [ ]  Monitor the job execution
     - [ ]  Ensure all tasks complete successfully
     - [ ]  Verify Bronze, Silver, and Gold tables are created correctly
-- [ ]  **Schedule the Pipeline**
+          
+- [ ]  **Step 4/4: Schedule the Pipeline**
+      
     - [ ]  Add a trigger to run the job on a schedule (for example daily)
     - [ ]  For the first few days: (Mointor the runes and check logs)
     - [ ]  After three days, pause or adjust the trigger as needed
