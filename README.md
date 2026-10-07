@@ -540,29 +540,28 @@ Nous utiliserons la modélisation dimensionnelle pour transformer les tables « 
              how="left"
             )
        
-            # Select important columns (customize as needed)
-            selected_df = joined_df.select(
-           "t.transaction_id",
-           "t.opportunity_name",
-           "t.product_id",
-           "t.store_id",
-           "t.quantity",
-           "t.selling_price",
-           "t.discount_amount",
-           "t.transaction_timestamp",
-           col("t.transaction_timestamp").cast("date").alias("transaction_date"),
-           "t.payment_mode",
-           "t.sales_channel",
-           "o.name",
-           "o.stage_name",
-           "o.owner_id",
-           "o.amount",
-            col("o.account_id").alias("customer_id")
-          )
-         return selected_df
+             # Select important columns (customize as needed)
+             selected_df = joined_df.select(
+            "t.transaction_id",
+            "t.opportunity_name",
+            "t.product_id",
+            "t.store_id",
+            "t.quantity",
+            "t.selling_price",
+            "t.discount_amount",
+            "t.transaction_timestamp",
+            col("t.transaction_timestamp").cast("date").alias("transaction_date"),
+            "t.payment_mode",
+            "t.sales_channel",
+            "o.name",
+            "o.stage_name",
+            "o.owner_id",
+            "o.amount",
+             col("o.account_id").alias("customer_id")
+            )
+            return selected_df
      >
-         
-- [ ]  Effectue des vérifications de cohérence sur le DataFrame final avant le run.
+  - [ ]  Effectue des vérifications de cohérence sur le DataFrame final avant le run.
          
     - [ ]  **Step 4/6: Run the pipeline**
   
@@ -580,7 +579,12 @@ Nous utiliserons la modélisation dimensionnelle pour transformer les tables « 
        - [ ]  Create **dim_calendar** with notebook via le fichier ***03_calendar.py***
            - [ ]  On peut générer la table calendar via genie avec la syntaxe suivante:
                  
-                 - "I want to create a calendar table in retail_q.retail_gold schema.It should have a date column which will be key column.Add other columns based on date like year, month, week which are standard columns used in generic calendar tables.Provide start and end date so that i can decide how mach data to be populated"
+> [!IMPORTANT]
+> **Goal of the question in genie:** Create dim_calendar
+> 
+> **Question 3:** "I want to create a calendar table in retail_q.retail_gold schema.It should have a date column which will be key column.Add other columns based on date like year, month, week which are standard columns used in generic calendar tables.Provide start and end date so that i can decide how mach data to be populated"
+> 
+>  **Answer 3:**             
          
    - [ ]  **Step 6/6: Commit & Push your changes to the GitHub repository**
          
@@ -637,9 +641,9 @@ You are now responsible for making it reliable, clear, and easy to use
 > [!IMPORTANT]
 > **Goal of the question in genie:** Create a Metric View sans passer par SQL et YAML
 > 
-> **Question 3:** 
+> **Question 4:** 
 > 
->  **Answer 3:**
+>  **Answer 4:**
               
    - [ ]  **Step 2/4: Github setup**
           
