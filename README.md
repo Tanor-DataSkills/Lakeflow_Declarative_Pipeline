@@ -714,6 +714,7 @@ You are now responsible for making it reliable, clear, and easy to use
 - 1 ETL pipeline nommé **retail_transaction** contenant 2 folders: bronze_to_silver et silver_to_gold
     - Dans ***bronze_to_silver*** il y'a les notebooks ***Product_catalog.py, inventory, account.py, opportunity.py, transactions.py***
     - Dans ***silver_to_gold*** on a les notebooks ***dim_product.py, dim_product.py, fact_sales.py***. Par simplicité on a juste créé le ***fact_sales.py***.
+- 1 un dashboard retail_gold_analytics_dashboard à raffraichir
 - 1 notebook pour la table dim_calendar (03_calendar.py)
 - 1 notebook pour les Views (02_Gold_Views.sql)
 - 1 notebook pour Metric View (04_Metric View.py)
@@ -732,13 +733,42 @@ To run each layer cleanly, we introduce **orchestration notebooks** that act as 
       
     - [ ]  Go to **Databricks → Jobs & Pipelines** then create Create a new Job
     - [ ]  Create a new Job and Give it a clear name, for example: ***RetaiQ_end_to_end_job***
-    - [ ]  Add Tasks:
-        On aura affaire à des pipelines tasks et notebook tasks selon le cas:
-        
-        - [ ]  Bronze layer: bronze notebook
-        - [ ]  Silver layer: silver_orchestration that triggers all other silver notebookes
-        - [ ]  Gold layer: gold_orchestration that triggers all other gold notebookes
-              
+    - [ ]  Add Tasks: Une tache d'exécution sera associée à chacun des pipelines(ingestion & ETL) et des notebooks
+    - [ ]  **Section 1: Add Ingestion Tasks**
+        - [ ]  **Postgres to postgres_bronze schema of Unity catalog ( Ingestion pipeline : postgres_to_bronze)**
+            - [ ]  Cliquez sur pipeline task
+            - [ ]  Nommer le task: ***postgres_to_bronze***
+            - [ ]  Definir le type de task : ***pipeline***
+            - [ ]  Choisir le ingestion pipeline en question par ceux qui s'affichent: ***postgres_to_bronze***
+            - [ ]  Cliquer sur ***Create task***
+            - [ ]  Notre premiere task est créé on clique ***Add task***
+        - [ ]  **Salesforce to salesforce_bronze schema of Unity catalog**
+            - [ ]  Clique Ingestion pipeline pour un choisir une task  qu'on nomme ***salesforce_to_bronze***
+            - [ ]  Delete the dependances entre les 2 tasks d'ingestion pour avoir une execution parallele(mais en mode gratuite on a la possibilité d'exécuter qu'une seule ingestion pipeline on garde alors la dependance)
+        - [ ]  **Volume to blob_bronze schema of Unity catalog (notebook : 01_blob_to_bronze.py)**
+            - [ ]  Add task pour le notebook ***blob_to_bronze***
+            - [ ]  Clique Notebook pour choisir une task  qu'on nomme ***blob_to_bronze***
+            - [ ]  Selectionner le notebook en question ***01_blob_to_bronze.py***
+    - [ ]  **Section 2 : Add ETL Tasks**
+        - [ ]  **postgres_bronze, salesforce_bronze, blob_bronze to retail_silver & retail_gold schemas of Unity catalog ( ETL pipeline : retail_transaction contenant 2 folders: bronze_to_silver et silver_to_gold)**
+            - [ ]  Add task -> ETL pipeline
+            - [ ]  Nommer le task: ***silver and gold***
+            - [ ]  Choisir le ETL pipeline en question par ceux qui s'affichent: ***retail_transaction***
+            - [ ]  Mettre une dépendance avec le blob_to_bronze
+            - [ ]  Cliquer sur ***Create task*** 
+  - [ ]  **Section 3 : Add Dashboard refresh Tasks**
+        - [ ]  **postgres_bronze, salesforce_bronze, blob_bronze to retail_silver & retail_gold schemas of Unity catalog ( ETL pipeline : retail_transaction contenant 2 folders: bronze_to_silver et silver_to_gold)**
+            - [ ]  Add task -> Dashboard
+            - [ ]  Nommer le task: ***Dashboard_refresh***
+            - [ ]  Choisir le dashboard en question par ceux qui s'affichent: ***retail_gold_analytics_dashboard***
+> [!NOTE]
+> On aura affaire à des pipelines tasks et notebook tasks selon le cas.
+> Nous avons 2 types de pipelines:
+> Pipeline type: ***Ingestion Pipeline*** & ***ETL Pipeline***
+> - Les **Les notebook Views** dans gold n'ont pas besoin d'être exécuter (02_Gold_Views.sql & 04_Metric View.py); leurs maj est automatique après la création des tables dans gold.
+> - Le **genie space** n'a pas aussi besoin d'execution; elle s'en occupe tout seul
+      
+      
 - [ ]  **Step 3/4: Run and Validate**
       
     - [ ]  Click **Run All,**
@@ -746,12 +776,17 @@ To run each layer cleanly, we introduce **orchestration notebooks** that act as 
     - [ ]  Ensure all tasks complete successfully
     - [ ]  Verify Bronze, Silver, and Gold tables are created correctly
           
-- [ ]  **Step 4/4: Schedule the Pipeline**
+- [ ]  **Step 4/4: Schedule, Trigger & some configs**
       
-    - [ ]  Add a trigger to run the job on a schedule (for example daily)
+    - [ ]  Add a trigger to run the job on a schedule trigger type(for example daily or file arrival)
     - [ ]  For the first few days: (Mointor the runes and check logs)
     - [ ]  After three days, pause or adjust the trigger as needed
+    - [ ]  Edit notification when job is failure
+    - [ ]  Integrer git
 
+> [!IMPORTANT]
+> Maintenant que nous avons configuré et run notre job tout est automatisé: des qu'un nouveau fichier source est disponible le job va tout executer maintenant ainsi notre système automatique.
+> 
 ---
 
 <aside>
@@ -764,13 +799,6 @@ This is **Lakehouse 1.0** and it represents the core foundation of real data eng
 
 </aside>
 
-<aside>
-
-### 🎓 Portfolio & Career Tip
-
-You can confidently use this project as a **portfolio project**. You have my permission to do so.
-
-If you share it on **GitHub** or **LinkedIn**, I would appreciate it if you give credit to the original source.
 
 If you are **preparing for job interviews**, make sure you practice explaining this project:
 
