@@ -1,22 +1,5 @@
 # Retail project using Lakeflow_Declarative_Pipelines
 
-> [!CAUTION]
->Ce bloc apparait en rouge
-
-> [!NOTE]
-> Ce bloc apparaît en bleu.
-
-> [!TIP]
-> Ce bloc apparaît en vert.
-
-> [!IMPORTANT]
-> Ce bloc apparaît en violet.
-
-> [!WARNING]
-> Ce bloc apparaît en jaune/orange.
-
-
-
 Ce projet est réalisé pour mettre en évidence la caapcité à développer un projet de data engineering de bout en bout avec Databricks en utilisant une approche appelée Lakeflow_Declarative_Pipeline. Pour bien montrer les fonctionnalité de Databricks on travaillera sur des données de retail.
 
 
